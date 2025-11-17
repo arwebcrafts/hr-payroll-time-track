@@ -1,57 +1,62 @@
-import { createClient } from '@/lib/supabase/server';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
+import { prisma } from '@/lib/prisma';
+import { redirect } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { FileText, Receipt, UserPlus, Clock, TrendingUp, AlertCircle, Eye, CheckCircle } from 'lucide-react';
 import Link from 'next/link';
 
 export default async function DashboardPage() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const session = await getServerSession(authOptions);
+
+  if (!session || !session.user) {
+    redirect('/auth/login');
+  }
+
+  const userId = session.user.id;
 
   // Fetch user profile
-  const { data: userProfile } = await supabase
-    .from('users')
-    .select('business_name')
-    .eq('id', user!.id)
-    .single();
+  const userProfile = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { businessName: true },
+  });
 
-  // Fetch metrics (these are placeholder queries - customize based on actual data)
-  const { count: totalProposals } = await supabase
-    .from('proposals')
-    .select('*', { count: 'exact', head: true })
-    .eq('user_id', user!.id);
+  // Fetch metrics
+  const totalProposals = await prisma.proposal.count({
+    where: { userId },
+  });
 
-  const { count: totalInvoices } = await supabase
-    .from('invoices')
-    .select('*', { count: 'exact', head: true })
-    .eq('user_id', user!.id);
+  const totalInvoices = await prisma.invoice.count({
+    where: { userId },
+  });
 
-  const { count: totalClients } = await supabase
-    .from('clients')
-    .select('*', { count: 'exact', head: true })
-    .eq('user_id', user!.id);
+  const totalClients = await prisma.client.count({
+    where: { userId },
+  });
 
-  const { count: pendingInvoices } = await supabase
-    .from('invoices')
-    .select('*', { count: 'exact', head: true })
-    .eq('user_id', user!.id)
-    .in('status', ['sent', 'viewed']);
+  const pendingInvoices = await prisma.invoice.count({
+    where: {
+      userId,
+      status: { in: ['sent', 'viewed'] },
+    },
+  });
 
-  const { count: overdueInvoices } = await supabase
-    .from('invoices')
-    .select('*', { count: 'exact', head: true })
-    .eq('user_id', user!.id)
-    .eq('status', 'overdue');
+  const overdueInvoices = await prisma.invoice.count({
+    where: {
+      userId,
+      status: 'overdue',
+    },
+  });
 
-  const { count: signedProposals } = await supabase
-    .from('proposals')
-    .select('*', { count: 'exact', head: true })
-    .eq('user_id', user!.id)
-    .eq('status', 'signed');
+  const signedProposals = await prisma.proposal.count({
+    where: {
+      userId,
+      status: 'signed',
+    },
+  });
 
-  const businessName = userProfile?.business_name || 'there';
+  const businessName = userProfile?.businessName || 'there';
 
   return (
     <div className="p-8">

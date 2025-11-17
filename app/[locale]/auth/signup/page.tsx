@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { createClient } from '@/lib/supabase/client';
+import { signIn } from 'next-auth/react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -35,26 +35,36 @@ export default function SignupPage() {
     }
 
     try {
-      const supabase = createClient();
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          emailRedirectTo: `${window.location.origin}/auth/callback`,
-        },
+      // Create account
+      const response = await fetch('/api/auth/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
       });
 
-      if (error) throw error;
+      const data = await response.json();
 
-      if (data.user) {
-        // Check if email confirmation is required or if auto-confirmed
-        if (data.session) {
-          // User is auto-logged in, redirect to onboarding
-          router.push('/onboarding');
-        } else {
-          // Email confirmation required
-          setSuccess(true);
-        }
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to create account');
+      }
+
+      // Auto-login after signup
+      const result = await signIn('credentials', {
+        redirect: false,
+        email,
+        password,
+      });
+
+      if (result?.error) {
+        setError('Account created but failed to log in. Please try logging in.');
+        setSuccess(true);
+        return;
+      }
+
+      if (result?.ok) {
+        // Redirect to onboarding
+        router.push('/onboarding');
+        router.refresh();
       }
     } catch (err: any) {
       setError(err.message || 'An error occurred during signup');
@@ -68,10 +78,9 @@ export default function SignupPage() {
       <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 px-4">
         <Card className="w-full max-w-md">
           <CardHeader>
-            <CardTitle>Check your email</CardTitle>
+            <CardTitle>Account Created!</CardTitle>
             <CardDescription>
-              We&apos;ve sent you a confirmation link. Please check your email to verify your
-              account.
+              Your account has been created successfully. Please log in to continue.
             </CardDescription>
           </CardHeader>
           <CardContent>
