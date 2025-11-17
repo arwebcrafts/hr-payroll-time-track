@@ -43,7 +43,7 @@ export default function FeaturesPage() {
             Everything You Need to <span className="text-primary">Scale Your Business</span>
           </h1>
           <p className="mx-auto mb-8 max-w-2xl text-xl text-muted-foreground">
-            From AI-powered proposals to automated invoicing, we've built every feature you need to
+            From AI-powered proposals to automated invoicing, we&apos;ve built every feature you need to
             run your freelance business or agency efficiently.
           </p>
         </div>

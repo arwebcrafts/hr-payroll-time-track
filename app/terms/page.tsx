@@ -25,7 +25,7 @@ export default function TermsPage() {
 
           <h2 className="mt-8 text-2xl font-semibold">1. Acceptance of Terms</h2>
           <p>
-            By accessing and using Das Program ("the Service"), you agree to be bound by these
+            By accessing and using Das Program (&quot;the Service&quot;), you agree to be bound by these
             Terms of Service. If you do not agree to these terms, please do not use the Service.
           </p>
 

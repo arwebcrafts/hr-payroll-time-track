@@ -43,7 +43,7 @@ export default function BlogPage() {
               <Rss className="mb-6 h-20 w-20 text-muted-foreground" />
               <h3 className="mb-2 text-2xl font-semibold">Blog Coming Soon</h3>
               <p className="mb-6 text-center text-muted-foreground max-w-md">
-                We're working on great content for you including tips on winning proposals, getting
+                We&apos;re working on great content for you including tips on winning proposals, getting
                 paid faster, and growing your business.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
@@ -64,7 +64,7 @@ export default function BlogPage() {
         <div className="container mx-auto px-4">
           <div className="mx-auto max-w-4xl">
             <h2 className="mb-8 text-2xl font-bold text-center">
-              Topics We'll Cover
+              Topics We&apos;ll Cover
             </h2>
             <div className="grid gap-6 md:grid-cols-2">
               {[

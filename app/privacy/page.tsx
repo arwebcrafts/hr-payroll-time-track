@@ -96,7 +96,7 @@ export default function PrivacyPage() {
             ensure appropriate safeguards are in place.
           </p>
 
-          <h2 className="mt-8 text-2xl font-semibold">9. Children's Privacy</h2>
+          <h2 className="mt-8 text-2xl font-semibold">9. Children&apos;s Privacy</h2>
           <p>
             Our services are not directed to children under 13. We do not knowingly collect
             information from children under 13.

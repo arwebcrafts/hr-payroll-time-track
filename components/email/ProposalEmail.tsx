@@ -62,7 +62,7 @@ export const ProposalEmail = ({
 
             {!message && (
               <Text style={text}>
-                Thank you for the opportunity to work with you. I'm excited to
+                Thank you for the opportunity to work with you. I&apos;m excited to
                 present this proposal for your review.
               </Text>
             )}
