@@ -2,6 +2,59 @@
 
 A comprehensive SaaS application for freelancers, agencies, and consultants to create professional proposals and invoices with AI assistance, time tracking, client management, and integrated payment processing.
 
+**🔄 NOW USING MYSQL + PRISMA + NEXTAUTH.JS** (Migrated from Supabase)
+
+---
+
+## 🚨 IMPORTANT: MySQL Migration
+
+**This application has been converted to use MySQL with Prisma ORM and NextAuth.js for authentication.**
+
+### What Changed:
+- ❌ **Supabase** (PostgreSQL + Auth) → ✅ **MySQL + Prisma + NextAuth.js**
+- ✅ **Prisma Schema** created (`prisma/schema.prisma`)
+- ✅ **NextAuth.js** configured for authentication
+- ✅ **Migration Guide** available (`MYSQL_MIGRATION.md`)
+- ⚠️ **Code Migration Required**: See MYSQL_MIGRATION.md for converting pages and API routes
+
+### Quick Start with MySQL:
+
+1. **Install Dependencies:**
+```bash
+npm install
+```
+
+2. **Set up MySQL Database:**
+```bash
+# Option A: Local MySQL
+mysql -u root -p
+CREATE DATABASE das_program;
+
+# Option B: Use PlanetScale (recommended)
+# Go to planetscale.com and create database
+```
+
+3. **Configure Environment Variables:**
+```bash
+cp .env.example .env
+# Edit .env with your DATABASE_URL and NEXTAUTH_SECRET
+```
+
+4. **Push Database Schema:**
+```bash
+npm run db:push
+```
+
+5. **Start Development:**
+```bash
+npm run dev
+```
+
+6. **Read Full Migration Guide:**
+See `MYSQL_MIGRATION.md` for complete instructions on converting pages and API routes.
+
+---
+
 ## 🎯 Features
 
 ### ✅ Completed & Working (No Configuration Required)
