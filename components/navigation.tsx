@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
-import { createClient } from '@/lib/supabase/client';
+import { signOut } from 'next-auth/react';
 import { Button } from '@/components/ui/button';
 import {
   LayoutDashboard,
@@ -35,8 +35,7 @@ export function Navigation() {
   const t = useTranslations('nav');
 
   const handleLogout = async () => {
-    const supabase = createClient();
-    await supabase.auth.signOut();
+    await signOut({ redirect: false });
     router.push('/auth/login');
     router.refresh();
   };

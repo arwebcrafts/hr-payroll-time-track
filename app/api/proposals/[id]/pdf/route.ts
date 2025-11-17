@@ -1,3 +1,4 @@
+import React from 'react';
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
@@ -56,7 +57,7 @@ export async function GET(
     }
 
     // Parse line items
-    const lineItems = Array.isArray(proposal.items) ? proposal.items : [];
+    const lineItems = Array.isArray(proposal.lineItems) ? proposal.lineItems : [];
 
     // Prepare PDF data
     const pdfData = {
@@ -67,14 +68,14 @@ export async function GET(
       companyEmail: proposal.user?.email,
       companyPhone: proposal.user?.businessPhone,
       companyAddress: proposal.user?.businessAddress,
-      companyLogo: proposal.user?.logoUrl,
+      companyLogo: proposal.user?.businessLogoUrl,
       clientName: proposal.client?.name || 'Client',
       clientCompany: proposal.client?.company,
       clientEmail: proposal.client?.email,
       clientPhone: proposal.client?.phone,
       clientAddress: proposal.client?.address,
       title: proposal.title || 'Project Proposal',
-      description: proposal.content,
+      description: proposal.description,
       lineItems: lineItems.map((item: any) => ({
         description: item.description || '',
         quantity: item.quantity || 1,
@@ -84,10 +85,10 @@ export async function GET(
       subtotal: proposal.subtotal,
       taxRate: proposal.taxRate || 0,
       taxAmount: proposal.taxAmount,
-      discount: proposal.discountAmount || 0,
+      discount: proposal.discount || 0,
       total: proposal.totalAmount,
       currency: proposal.currency || 'USD',
-      terms: 'Payment is due within 30 days of proposal acceptance. 50% deposit required to begin work.',
+      terms: proposal.terms || 'Payment is due within 30 days of proposal acceptance. 50% deposit required to begin work.',
       notes: proposal.notes,
     };
 

@@ -1,3 +1,4 @@
+import React from 'react';
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
@@ -57,25 +58,25 @@ export async function GET(
 
     // Parse line items if stored as JSON
     const lineItems =
-      typeof invoice.line_items === 'string'
-        ? JSON.parse(invoice.line_items)
-        : invoice.line_items || [];
+      typeof invoice.lineItems === 'string'
+        ? JSON.parse(invoice.lineItems)
+        : invoice.lineItems || [];
 
     // Calculate amounts
     const subtotal = lineItems.reduce(
       (sum: number, item: any) => sum + (item.amount || 0),
       0
     );
-    const taxAmount = (subtotal * (invoice.tax_rate || 0)) / 100;
+    const taxAmount = (subtotal * (invoice.taxRate || 0)) / 100;
     const totalAfterTax = subtotal + taxAmount;
     const total = totalAfterTax - (invoice.discount || 0);
-    const amountPaid = invoice.amount_paid || 0;
+    const amountPaid = invoice.amountPaid || 0;
     const amountDue = total - amountPaid;
 
     // Determine status based on due date and payment
     let status = invoice.status;
-    if (status === 'sent' && invoice.due_date) {
-      const dueDate = new Date(invoice.due_date);
+    if (status === 'sent' && invoice.dueDate) {
+      const dueDate = new Date(invoice.dueDate);
       const now = new Date();
       if (now > dueDate && amountDue > 0) {
         status = 'overdue';
@@ -87,23 +88,23 @@ export async function GET(
 
     // Prepare PDF data
     const pdfData = {
-      invoiceNumber: invoice.invoice_number || `INV-${invoice.id.slice(0, 8)}`,
-      issueDate: invoice.issue_date || invoice.created_at,
-      dueDate: invoice.due_date || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+      invoiceNumber: invoice.invoiceNumber || `INV-${invoice.id.slice(0, 8)}`,
+      issueDate: invoice.issueDate || invoice.createdAt,
+      dueDate: invoice.dueDate || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
       status: status as 'draft' | 'sent' | 'paid' | 'overdue' | 'cancelled',
-      paymentTerms: invoice.payment_terms || 'Net 30',
-      companyName: invoice.user?.business_name || 'Your Company',
+      paymentTerms: invoice.paymentTerms || 'Net 30',
+      companyName: invoice.user?.businessName || 'Your Company',
       companyEmail: invoice.user?.email,
-      companyPhone: invoice.user?.phone,
-      companyAddress: invoice.user?.address,
-      companyTaxId: invoice.user?.tax_id,
-      companyLogo: invoice.user?.logo_url,
+      companyPhone: invoice.user?.businessPhone,
+      companyAddress: invoice.user?.businessAddress,
+      companyTaxId: invoice.user?.taxId,
+      companyLogo: invoice.user?.businessLogoUrl,
       clientName: invoice.client?.name || 'Client',
       clientCompany: invoice.client?.company,
       clientEmail: invoice.client?.email,
       clientPhone: invoice.client?.phone,
       clientAddress: invoice.client?.address,
-      clientVatNumber: invoice.client?.vat_number,
+      clientVatNumber: invoice.client?.vatNumber,
       lineItems: lineItems.map((item: any) => ({
         description: item.description || '',
         quantity: item.quantity || 1,
@@ -111,15 +112,15 @@ export async function GET(
         amount: item.amount || 0,
       })),
       subtotal,
-      taxRate: invoice.tax_rate || 0,
+      taxRate: invoice.taxRate || 0,
       taxAmount,
       discount: invoice.discount || 0,
       total,
       amountPaid,
       amountDue,
-      currency: invoice.user?.currency || 'USD',
+      currency: invoice.user?.defaultCurrency || 'USD',
       notes: invoice.notes,
-      paymentInstructions: invoice.payment_instructions,
+      paymentInstructions: invoice.paymentInstructions,
     };
 
     // Generate PDF stream
