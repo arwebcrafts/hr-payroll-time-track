@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Plus, Receipt, Eye, CheckCircle, Clock, AlertCircle } from 'lucide-react';
 import Link from 'next/link';
 import { formatCurrency, formatDate } from '@/lib/utils';
+import { DownloadInvoiceButton } from '@/components/DownloadInvoiceButton';
 
 const statusConfig = {
   draft: { label: 'Draft', variant: 'outline' as const, icon: Clock },
@@ -144,6 +145,10 @@ export default async function InvoicesPage() {
                     <Button variant="outline" size="sm">
                       View
                     </Button>
+                    <DownloadInvoiceButton
+                      invoiceId={invoice.id}
+                      invoiceNumber={invoice.invoice_number}
+                    />
                     {invoice.status === 'draft' && (
                       <>
                         <Button variant="outline" size="sm">

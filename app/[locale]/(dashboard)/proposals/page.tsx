@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Plus, FileText, Eye, CheckCircle, XCircle, Clock } from 'lucide-react';
 import Link from 'next/link';
 import { formatCurrency, formatDate } from '@/lib/utils';
+import { DownloadProposalButton } from '@/components/DownloadProposalButton';
 
 const statusConfig = {
   draft: { label: 'Draft', variant: 'outline' as const, icon: Clock },
@@ -124,6 +125,10 @@ export default async function ProposalsPage() {
                     <Button variant="outline" size="sm">
                       View
                     </Button>
+                    <DownloadProposalButton
+                      proposalId={proposal.id}
+                      proposalNumber={proposal.proposal_number}
+                    />
                     {proposal.status === 'draft' && (
                       <>
                         <Button variant="outline" size="sm">
