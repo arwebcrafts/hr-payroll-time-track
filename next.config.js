@@ -5,10 +5,12 @@ const nextConfig = {
   images: {
     domains: ['localhost'],
     remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: '**.supabase.co',
-      },
+      // Add your custom image domains here if needed
+      // Example:
+      // {
+      //   protocol: 'https',
+      //   hostname: 'cdn.yourdomain.com',
+      // },
     ],
   },
   experimental: {
