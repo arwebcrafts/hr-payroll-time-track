@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { createClient } from '@/lib/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -31,25 +30,25 @@ export default function SettingsPage() {
   }, []);
 
   const fetchUserProfile = async () => {
-    const supabase = createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    if (!user) return;
+    try {
+      const response = await fetch('/api/user');
+      const data = await response.json();
 
-    const { data } = await supabase.from('users').select('*').eq('id', user.id).single();
-    if (data) {
-      setFormData({
-        businessName: data.business_name || '',
-        businessEmail: data.business_email || '',
-        businessPhone: data.business_phone || '',
-        businessAddress: data.business_address || '',
-        businessWebsite: data.business_website || '',
-        taxId: data.tax_id || '',
-        vatNumber: data.vat_number || '',
-        defaultCurrency: data.default_currency || 'USD',
-        defaultLanguage: data.default_language || 'en',
-      });
+      if (response.ok && data.user) {
+        setFormData({
+          businessName: data.user.businessName || '',
+          businessEmail: data.user.businessEmail || '',
+          businessPhone: data.user.businessPhone || '',
+          businessAddress: data.user.businessAddress || '',
+          businessWebsite: data.user.businessWebsite || '',
+          taxId: data.user.taxId || '',
+          vatNumber: data.user.vatNumber || '',
+          defaultCurrency: data.user.defaultCurrency || 'USD',
+          defaultLanguage: data.user.defaultLanguage || 'en',
+        });
+      }
+    } catch (error) {
+      console.error('Failed to fetch user profile:', error);
     }
   };
 
@@ -64,28 +63,17 @@ export default function SettingsPage() {
     setSuccess(false);
 
     try {
-      const supabase = createClient();
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      if (!user) throw new Error('Not authenticated');
+      const response = await fetch('/api/user', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
 
-      const { error: updateError } = await supabase
-        .from('users')
-        .update({
-          business_name: formData.businessName,
-          business_email: formData.businessEmail,
-          business_phone: formData.businessPhone,
-          business_address: formData.businessAddress,
-          business_website: formData.businessWebsite,
-          tax_id: formData.taxId,
-          vat_number: formData.vatNumber,
-          default_currency: formData.defaultCurrency,
-          default_language: formData.defaultLanguage,
-        })
-        .eq('id', user.id);
+      const data = await response.json();
 
-      if (updateError) throw updateError;
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to update settings');
+      }
 
       setSuccess(true);
       setTimeout(() => setSuccess(false), 3000);

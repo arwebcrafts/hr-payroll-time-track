@@ -1,8 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { createClient } from '@/lib/supabase/client';
+import { useRouter, useParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -10,7 +9,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { ArrowLeft, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 
-export default function EditClientPage({ params }: { params: { id: string } }) {
+export default function EditClientPage() {
+  const params = useParams();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(true);
@@ -35,34 +35,25 @@ export default function EditClientPage({ params }: { params: { id: string } }) {
 
   const fetchClient = async () => {
     try {
-      const supabase = createClient();
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
+      const response = await fetch(`/api/clients/${params.id}`);
+      const data = await response.json();
 
-      if (!user) throw new Error('Not authenticated');
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to fetch client');
+      }
 
-      const { data, error: fetchError } = await supabase
-        .from('clients')
-        .select('*')
-        .eq('id', params.id)
-        .eq('user_id', user.id)
-        .single();
-
-      if (fetchError) throw fetchError;
-
-      if (data) {
+      if (data.client) {
         setFormData({
-          name: data.name || '',
-          company: data.company || '',
-          email: data.email || '',
-          phone: data.phone || '',
-          address: data.address || '',
-          city: data.city || '',
-          postalCode: data.postal_code || '',
-          country: data.country || '',
-          vatNumber: data.vat_number || '',
-          languagePreference: data.language_preference || 'en',
+          name: data.client.name || '',
+          company: data.client.company || '',
+          email: data.client.email || '',
+          phone: data.client.phone || '',
+          address: data.client.address || '',
+          city: data.client.city || '',
+          postalCode: data.client.postalCode || '',
+          country: data.client.country || '',
+          vatNumber: data.client.vatNumber || '',
+          languagePreference: data.client.languagePreference || 'en',
         });
       }
     } catch (err: any) {
@@ -82,31 +73,17 @@ export default function EditClientPage({ params }: { params: { id: string } }) {
     setError(null);
 
     try {
-      const supabase = createClient();
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
+      const response = await fetch(`/api/clients/${params.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
 
-      if (!user) throw new Error('Not authenticated');
+      const data = await response.json();
 
-      const { error: updateError } = await supabase
-        .from('clients')
-        .update({
-          name: formData.name,
-          company: formData.company || null,
-          email: formData.email,
-          phone: formData.phone || null,
-          address: formData.address || null,
-          city: formData.city || null,
-          postal_code: formData.postalCode || null,
-          country: formData.country || null,
-          vat_number: formData.vatNumber || null,
-          language_preference: formData.languagePreference,
-        })
-        .eq('id', params.id)
-        .eq('user_id', user.id);
-
-      if (updateError) throw updateError;
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to update client');
+      }
 
       router.push('/clients');
       router.refresh();

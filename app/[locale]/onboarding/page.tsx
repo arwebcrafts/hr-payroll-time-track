@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { createClient } from '@/lib/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -65,51 +64,36 @@ export default function OnboardingPage() {
   const handleFinish = async () => {
     setLoading(true);
     try {
-      const supabase = createClient();
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-
-      if (!user) throw new Error('No user found');
-
-      // Upload logo if provided
-      let logoUrl = null;
-      if (formData.logoFile) {
-        const fileExt = formData.logoFile.name.split('.').pop();
-        const fileName = `${user.id}/logo.${fileExt}`;
-        const { error: uploadError } = await supabase.storage
-          .from('logos')
-          .upload(fileName, formData.logoFile, { upsert: true });
-
-        if (!uploadError) {
-          const {
-            data: { publicUrl },
-          } = supabase.storage.from('logos').getPublicUrl(fileName);
-          logoUrl = publicUrl;
-        }
-      }
+      // Note: Logo upload functionality would need to be implemented separately
+      // with a file storage solution (local storage, AWS S3, etc.)
 
       // Update user profile
-      const { error } = await supabase.from('users').upsert({
-        id: user.id,
-        business_name: formData.businessName,
-        business_email: formData.businessEmail,
-        business_phone: formData.businessPhone,
-        business_address: formData.businessAddress,
-        business_website: formData.businessWebsite,
-        business_logo_url: logoUrl,
-        tax_id: formData.taxId,
-        vat_number: formData.vatNumber,
-        bank_details: {
-          bank_name: formData.bankName,
-          account_number: formData.accountNumber,
-          routing_number: formData.routingNumber,
-        },
-        default_currency: formData.defaultCurrency,
-        default_language: formData.defaultLanguage,
+      const response = await fetch('/api/user', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          businessName: formData.businessName,
+          businessEmail: formData.businessEmail,
+          businessPhone: formData.businessPhone,
+          businessAddress: formData.businessAddress,
+          businessWebsite: formData.businessWebsite,
+          taxId: formData.taxId,
+          vatNumber: formData.vatNumber,
+          bankDetails: {
+            bankName: formData.bankName,
+            accountNumber: formData.accountNumber,
+            routingNumber: formData.routingNumber,
+          },
+          defaultCurrency: formData.defaultCurrency,
+          defaultLanguage: formData.defaultLanguage,
+        }),
       });
 
-      if (error) throw error;
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to save profile');
+      }
 
       // Redirect to dashboard
       router.push('/dashboard');

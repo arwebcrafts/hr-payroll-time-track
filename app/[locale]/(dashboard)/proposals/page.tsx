@@ -1,4 +1,7 @@
-import { createClient } from '@/lib/supabase/server';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
+import { prisma } from '@/lib/prisma';
+import { redirect } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -17,22 +20,24 @@ const statusConfig = {
 };
 
 export default async function ProposalsPage() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const session = await getServerSession(authOptions);
 
-  const { data: proposals, error } = await supabase
-    .from('proposals')
-    .select(`
-      *,
-      clients (
-        name,
-        company
-      )
-    `)
-    .eq('user_id', user!.id)
-    .order('created_at', { ascending: false });
+  if (!session || !session.user) {
+    redirect('/auth/login');
+  }
+
+  const proposals = await prisma.proposal.findMany({
+    where: { userId: session.user.id },
+    include: {
+      client: {
+        select: {
+          name: true,
+          company: true,
+        },
+      },
+    },
+    orderBy: { createdAt: 'desc' },
+  });
 
   return (
     <div className="p-8">
@@ -69,10 +74,10 @@ export default async function ProposalsPage() {
         </Card>
       ) : (
         <div className="space-y-4">
-          {proposals.map((proposal: any) => {
+          {proposals.map((proposal) => {
             const status = statusConfig[proposal.status as keyof typeof statusConfig];
             const StatusIcon = status.icon;
-            const client = proposal.clients;
+            const client = proposal.client;
 
             return (
               <Card key={proposal.id} className="hover:shadow-md transition-shadow">
@@ -93,29 +98,29 @@ export default async function ProposalsPage() {
                           {client?.company && ` (${client.company})`}
                         </p>
                         <p>
-                          <span className="font-medium">Number:</span> {proposal.proposal_number}
+                          <span className="font-medium">Number:</span> {proposal.proposalNumber}
                         </p>
                         <p>
                           <span className="font-medium">Created:</span>{' '}
-                          {formatDate(proposal.created_at)}
+                          {formatDate(proposal.createdAt)}
                         </p>
-                        {proposal.valid_until && (
+                        {proposal.validUntil && (
                           <p>
                             <span className="font-medium">Valid Until:</span>{' '}
-                            {formatDate(proposal.valid_until)}
+                            {formatDate(proposal.validUntil)}
                           </p>
                         )}
-                        {proposal.view_count > 0 && (
+                        {proposal.viewCount > 0 && (
                           <p>
                             <Eye className="inline h-3 w-3 mr-1" />
-                            Viewed {proposal.view_count} time{proposal.view_count !== 1 ? 's' : ''}
+                            Viewed {proposal.viewCount} time{proposal.viewCount !== 1 ? 's' : ''}
                           </p>
                         )}
                       </div>
                     </div>
                     <div className="text-right">
                       <div className="text-2xl font-bold">
-                        {formatCurrency(proposal.total_amount, proposal.currency)}
+                        {formatCurrency(proposal.totalAmount, proposal.currency)}
                       </div>
                     </div>
                   </div>
@@ -127,7 +132,7 @@ export default async function ProposalsPage() {
                     </Button>
                     <DownloadProposalButton
                       proposalId={proposal.id}
-                      proposalNumber={proposal.proposal_number}
+                      proposalNumber={proposal.proposalNumber}
                     />
                     {proposal.status === 'draft' && (
                       <>

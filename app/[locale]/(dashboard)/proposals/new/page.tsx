@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { createClient } from '@/lib/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -31,14 +30,15 @@ export default function NewProposalPage() {
   }, []);
 
   const fetchClients = async () => {
-    const supabase = createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    if (!user) return;
-
-    const { data } = await supabase.from('clients').select('*').eq('user_id', user.id);
-    if (data) setClients(data);
+    try {
+      const response = await fetch('/api/clients');
+      const data = await response.json();
+      if (response.ok && data.clients) {
+        setClients(data.clients);
+      }
+    } catch (error) {
+      console.error('Failed to fetch clients:', error);
+    }
   };
 
   const updateField = (field: string, value: any) => {
@@ -89,41 +89,37 @@ export default function NewProposalPage() {
     setError(null);
 
     try {
-      const supabase = createClient();
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-
-      if (!user) throw new Error('Not authenticated');
-
       const { subtotal, taxAmount, total } = calculateTotals();
 
-      const { data, error: insertError } = await supabase
-        .from('proposals')
-        .insert({
-          user_id: user.id,
-          client_id: formData.clientId,
-          proposal_number: generateProposalNumber(),
+      const response = await fetch('/api/proposals', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          clientId: formData.clientId,
+          proposalNumber: generateProposalNumber(),
           title: formData.title,
-          template_id: 'professional',
+          templateId: 'professional',
           language: 'en',
           content: {
             description: formData.description,
           },
           items: formData.items,
           subtotal,
-          tax_rate: formData.taxRate,
-          tax_amount: taxAmount,
-          discount_amount: formData.discountAmount,
-          total_amount: total,
+          taxRate: formData.taxRate,
+          taxAmount,
+          discountAmount: formData.discountAmount,
+          totalAmount: total,
           currency: 'USD',
           status: 'draft',
-          valid_until: formData.validUntil || null,
-        })
-        .select()
-        .single();
+          validUntil: formData.validUntil || null,
+        }),
+      });
 
-      if (insertError) throw insertError;
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to create proposal');
+      }
 
       router.push('/proposals');
       router.refresh();

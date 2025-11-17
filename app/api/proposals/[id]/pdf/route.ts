@@ -1,109 +1,93 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
+import { prisma } from '@/lib/prisma';
 import { renderToStream } from '@react-pdf/renderer';
 import ProposalPDFTemplate from '@/components/pdf/ProposalPDFTemplate';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const supabase = await createClient();
-
     // Get authenticated user
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
+    const session = await getServerSession(authOptions);
 
-    if (authError || !user) {
+    if (!session || !session.user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const proposalId = params.id;
+    const { id: proposalId } = await params;
 
     // Fetch proposal with client and user details
-    const { data: proposal, error: proposalError } = await supabase
-      .from('proposals')
-      .select(
-        `
-        *,
-        client:clients(
-          name,
-          company,
-          email,
-          phone,
-          address,
-          vat_number
-        ),
-        user:users(
-          business_name,
-          email,
-          phone,
-          address,
-          tax_id,
-          logo_url,
-          currency,
-          language
-        )
-      `
-      )
-      .eq('id', proposalId)
-      .eq('user_id', user.id)
-      .single();
+    const proposal = await prisma.proposal.findFirst({
+      where: {
+        id: proposalId,
+        userId: session.user.id,
+      },
+      include: {
+        client: {
+          select: {
+            name: true,
+            company: true,
+            email: true,
+            phone: true,
+            address: true,
+            vatNumber: true,
+          },
+        },
+        user: {
+          select: {
+            businessName: true,
+            email: true,
+            businessPhone: true,
+            businessAddress: true,
+            taxId: true,
+            logoUrl: true,
+            defaultCurrency: true,
+            defaultLanguage: true,
+          },
+        },
+      },
+    });
 
-    if (proposalError || !proposal) {
-      return NextResponse.json(
-        { error: 'Proposal not found' },
-        { status: 404 }
-      );
+    if (!proposal) {
+      return NextResponse.json({ error: 'Proposal not found' }, { status: 404 });
     }
 
-    // Parse line items if stored as JSON
-    const lineItems =
-      typeof proposal.line_items === 'string'
-        ? JSON.parse(proposal.line_items)
-        : proposal.line_items || [];
-
-    // Calculate amounts
-    const subtotal = lineItems.reduce(
-      (sum: number, item: any) => sum + (item.amount || 0),
-      0
-    );
-    const taxAmount = (subtotal * (proposal.tax_rate || 0)) / 100;
-    const totalAfterTax = subtotal + taxAmount;
-    const total = totalAfterTax - (proposal.discount || 0);
+    // Parse line items
+    const lineItems = Array.isArray(proposal.items) ? proposal.items : [];
 
     // Prepare PDF data
     const pdfData = {
-      proposalNumber: proposal.proposal_number || `PROP-${proposal.id.slice(0, 8)}`,
-      createdAt: proposal.created_at,
-      validUntil: proposal.valid_until || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
-      companyName: proposal.user?.business_name || 'Your Company',
+      proposalNumber: proposal.proposalNumber || `PROP-${proposal.id.slice(0, 8)}`,
+      createdAt: proposal.createdAt,
+      validUntil: proposal.validUntil || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+      companyName: proposal.user?.businessName || 'Your Company',
       companyEmail: proposal.user?.email,
-      companyPhone: proposal.user?.phone,
-      companyAddress: proposal.user?.address,
-      companyLogo: proposal.user?.logo_url,
+      companyPhone: proposal.user?.businessPhone,
+      companyAddress: proposal.user?.businessAddress,
+      companyLogo: proposal.user?.logoUrl,
       clientName: proposal.client?.name || 'Client',
       clientCompany: proposal.client?.company,
       clientEmail: proposal.client?.email,
       clientPhone: proposal.client?.phone,
       clientAddress: proposal.client?.address,
       title: proposal.title || 'Project Proposal',
-      description: proposal.description,
+      description: proposal.content,
       lineItems: lineItems.map((item: any) => ({
         description: item.description || '',
         quantity: item.quantity || 1,
-        rate: item.rate || 0,
-        amount: item.amount || 0,
+        rate: item.unitPrice || 0,
+        amount: (item.quantity || 1) * (item.unitPrice || 0),
       })),
-      subtotal,
-      taxRate: proposal.tax_rate || 0,
-      taxAmount,
-      discount: proposal.discount || 0,
-      total,
-      currency: proposal.user?.currency || 'USD',
-      terms: proposal.terms || 'Payment is due within 30 days of proposal acceptance. 50% deposit required to begin work.',
+      subtotal: proposal.subtotal,
+      taxRate: proposal.taxRate || 0,
+      taxAmount: proposal.taxAmount,
+      discount: proposal.discountAmount || 0,
+      total: proposal.totalAmount,
+      currency: proposal.currency || 'USD',
+      terms: 'Payment is due within 30 days of proposal acceptance. 50% deposit required to begin work.',
       notes: proposal.notes,
     };
 
@@ -129,7 +113,7 @@ export async function GET(
       status: 200,
       headers: {
         'Content-Type': 'application/pdf',
-        'Content-Disposition': `attachment; filename="proposal-${proposal.proposal_number || proposalId}.pdf"`,
+        'Content-Disposition': `attachment; filename="proposal-${proposal.proposalNumber || proposalId}.pdf"`,
       },
     });
   } catch (error) {

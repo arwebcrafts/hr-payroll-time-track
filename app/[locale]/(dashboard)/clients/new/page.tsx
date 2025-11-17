@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { createClient } from '@/lib/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -38,32 +37,17 @@ export default function NewClientPage() {
     setError(null);
 
     try {
-      const supabase = createClient();
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
+      const response = await fetch('/api/clients', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
 
-      if (!user) throw new Error('Not authenticated');
+      const data = await response.json();
 
-      const { data, error: insertError } = await supabase
-        .from('clients')
-        .insert({
-          user_id: user.id,
-          name: formData.name,
-          company: formData.company || null,
-          email: formData.email,
-          phone: formData.phone || null,
-          address: formData.address || null,
-          city: formData.city || null,
-          postal_code: formData.postalCode || null,
-          country: formData.country || null,
-          vat_number: formData.vatNumber || null,
-          language_preference: formData.languagePreference,
-        })
-        .select()
-        .single();
-
-      if (insertError) throw insertError;
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to create client');
+      }
 
       router.push('/clients');
       router.refresh();

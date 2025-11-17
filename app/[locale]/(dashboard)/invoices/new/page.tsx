@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { createClient } from '@/lib/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -36,14 +35,15 @@ export default function NewInvoicePage() {
   }, []);
 
   const fetchClients = async () => {
-    const supabase = createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    if (!user) return;
-
-    const { data } = await supabase.from('clients').select('*').eq('user_id', user.id);
-    if (data) setClients(data);
+    try {
+      const response = await fetch('/api/clients');
+      const data = await response.json();
+      if (response.ok && data.clients) {
+        setClients(data.clients);
+      }
+    } catch (error) {
+      console.error('Failed to fetch clients:', error);
+    }
   };
 
   const updateField = (field: string, value: any) => {
@@ -94,40 +94,36 @@ export default function NewInvoicePage() {
     setError(null);
 
     try {
-      const supabase = createClient();
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-
-      if (!user) throw new Error('Not authenticated');
-
       const { subtotal, taxAmount, total } = calculateTotals();
 
-      const { data, error: insertError } = await supabase
-        .from('invoices')
-        .insert({
-          user_id: user.id,
-          client_id: formData.clientId,
-          invoice_number: generateInvoiceNumber(),
-          template_id: 'clean',
+      const response = await fetch('/api/invoices', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          clientId: formData.clientId,
+          invoiceNumber: generateInvoiceNumber(),
+          templateId: 'clean',
           language: 'en',
           items: formData.items,
           subtotal,
-          tax_rate: formData.taxRate,
-          tax_amount: taxAmount,
-          discount_amount: formData.discountAmount,
-          total_amount: total,
+          taxRate: formData.taxRate,
+          taxAmount,
+          discountAmount: formData.discountAmount,
+          totalAmount: total,
           currency: 'USD',
           status: 'draft',
-          payment_terms: formData.paymentTerms,
-          issue_date: formData.issueDate,
-          due_date: formData.dueDate,
+          paymentTerms: formData.paymentTerms,
+          issueDate: formData.issueDate,
+          dueDate: formData.dueDate,
           notes: formData.notes || null,
-        })
-        .select()
-        .single();
+        }),
+      });
 
-      if (insertError) throw insertError;
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to create invoice');
+      }
 
       router.push('/invoices');
       router.refresh();

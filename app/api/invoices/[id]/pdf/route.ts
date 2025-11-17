@@ -1,62 +1,58 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
+import { prisma } from '@/lib/prisma';
 import { renderToStream } from '@react-pdf/renderer';
 import InvoicePDFTemplate from '@/components/pdf/InvoicePDFTemplate';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const supabase = await createClient();
-
     // Get authenticated user
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
+    const session = await getServerSession(authOptions);
 
-    if (authError || !user) {
+    if (!session || !session.user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const invoiceId = params.id;
+    const { id: invoiceId } = await params;
 
     // Fetch invoice with client and user details
-    const { data: invoice, error: invoiceError } = await supabase
-      .from('invoices')
-      .select(
-        `
-        *,
-        client:clients(
-          name,
-          company,
-          email,
-          phone,
-          address,
-          vat_number
-        ),
-        user:users(
-          business_name,
-          email,
-          phone,
-          address,
-          tax_id,
-          logo_url,
-          currency,
-          language
-        )
-      `
-      )
-      .eq('id', invoiceId)
-      .eq('user_id', user.id)
-      .single();
+    const invoice = await prisma.invoice.findFirst({
+      where: {
+        id: invoiceId,
+        userId: session.user.id,
+      },
+      include: {
+        client: {
+          select: {
+            name: true,
+            company: true,
+            email: true,
+            phone: true,
+            address: true,
+            vatNumber: true,
+          },
+        },
+        user: {
+          select: {
+            businessName: true,
+            email: true,
+            businessPhone: true,
+            businessAddress: true,
+            taxId: true,
+            logoUrl: true,
+            defaultCurrency: true,
+            defaultLanguage: true,
+          },
+        },
+      },
+    });
 
-    if (invoiceError || !invoice) {
-      return NextResponse.json(
-        { error: 'Invoice not found' },
-        { status: 404 }
-      );
+    if (!invoice) {
+      return NextResponse.json({ error: 'Invoice not found' }, { status: 404 });
     }
 
     // Parse line items if stored as JSON

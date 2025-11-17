@@ -1,20 +1,23 @@
-import { createClient } from '@/lib/supabase/server';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
+import { prisma } from '@/lib/prisma';
+import { redirect } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Plus, Mail, Phone, Building2 } from 'lucide-react';
 import Link from 'next/link';
 
 export default async function ClientsPage() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const session = await getServerSession(authOptions);
 
-  const { data: clients, error } = await supabase
-    .from('clients')
-    .select('*')
-    .eq('user_id', user!.id)
-    .order('created_at', { ascending: false });
+  if (!session || !session.user) {
+    redirect('/auth/login');
+  }
+
+  const clients = await prisma.client.findMany({
+    where: { userId: session.user.id },
+    orderBy: { createdAt: 'desc' },
+  });
 
   return (
     <div className="p-8">
@@ -84,9 +87,9 @@ export default async function ClientsPage() {
                   </div>
                 )}
                 <div className="pt-4 flex gap-2">
-                  <Link href={`/clients/${client.id}`} className="flex-1">
+                  <Link href={`/clients/${client.id}/edit`} className="flex-1">
                     <Button variant="outline" size="sm" className="w-full">
-                      View Details
+                      Edit
                     </Button>
                   </Link>
                   <Link href={`/proposals/new?client=${client.id}`}>

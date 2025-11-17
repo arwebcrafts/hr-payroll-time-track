@@ -1,4 +1,7 @@
-import { createClient } from '@/lib/supabase/server';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
+import { prisma } from '@/lib/prisma';
+import { redirect } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -18,22 +21,24 @@ const statusConfig = {
 };
 
 export default async function InvoicesPage() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const session = await getServerSession(authOptions);
 
-  const { data: invoices } = await supabase
-    .from('invoices')
-    .select(`
-      *,
-      clients (
-        name,
-        company
-      )
-    `)
-    .eq('user_id', user!.id)
-    .order('created_at', { ascending: false });
+  if (!session || !session.user) {
+    redirect('/auth/login');
+  }
+
+  const invoices = await prisma.invoice.findMany({
+    where: { userId: session.user.id },
+    include: {
+      client: {
+        select: {
+          name: true,
+          company: true,
+        },
+      },
+    },
+    orderBy: { createdAt: 'desc' },
+  });
 
   return (
     <div className="p-8">
@@ -70,14 +75,14 @@ export default async function InvoicesPage() {
         </Card>
       ) : (
         <div className="space-y-4">
-          {invoices.map((invoice: any) => {
+          {invoices.map((invoice) => {
             const status = statusConfig[invoice.status as keyof typeof statusConfig];
             const StatusIcon = status.icon;
-            const client = invoice.clients;
+            const client = invoice.client;
             const isOverdue =
               invoice.status !== 'paid' &&
-              invoice.due_date &&
-              new Date(invoice.due_date) < new Date();
+              invoice.dueDate &&
+              new Date(invoice.dueDate) < new Date();
 
             return (
               <Card
@@ -90,7 +95,7 @@ export default async function InvoicesPage() {
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
                       <div className="flex items-center gap-3 mb-2">
-                        <CardTitle className="text-xl">Invoice {invoice.invoice_number}</CardTitle>
+                        <CardTitle className="text-xl">Invoice {invoice.invoiceNumber}</CardTitle>
                         <Badge variant={isOverdue ? 'destructive' : status.variant}>
                           <StatusIcon className="mr-1 h-3 w-3" />
                           {isOverdue ? 'Overdue' : status.label}
@@ -104,37 +109,37 @@ export default async function InvoicesPage() {
                         </p>
                         <p>
                           <span className="font-medium">Issue Date:</span>{' '}
-                          {formatDate(invoice.issue_date)}
+                          {formatDate(invoice.issueDate)}
                         </p>
                         <p>
                           <span className="font-medium">Due Date:</span>{' '}
-                          {formatDate(invoice.due_date)}
+                          {formatDate(invoice.dueDate)}
                           {isOverdue && (
                             <span className="ml-2 text-destructive font-medium">
                               (
                               {Math.floor(
-                                (new Date().getTime() - new Date(invoice.due_date).getTime()) /
+                                (new Date().getTime() - new Date(invoice.dueDate).getTime()) /
                                   (1000 * 60 * 60 * 24)
                               )}{' '}
                               days overdue)
                             </span>
                           )}
                         </p>
-                        {invoice.view_count > 0 && (
+                        {invoice.viewCount > 0 && (
                           <p>
                             <Eye className="inline h-3 w-3 mr-1" />
-                            Viewed {invoice.view_count} time{invoice.view_count !== 1 ? 's' : ''}
+                            Viewed {invoice.viewCount} time{invoice.viewCount !== 1 ? 's' : ''}
                           </p>
                         )}
                       </div>
                     </div>
                     <div className="text-right">
                       <div className="text-2xl font-bold">
-                        {formatCurrency(invoice.total_amount, invoice.currency)}
+                        {formatCurrency(invoice.totalAmount, invoice.currency)}
                       </div>
-                      {invoice.paid_amount > 0 && invoice.status !== 'paid' && (
+                      {invoice.paidAmount > 0 && invoice.status !== 'paid' && (
                         <div className="text-sm text-muted-foreground">
-                          {formatCurrency(invoice.paid_amount, invoice.currency)} paid
+                          {formatCurrency(invoice.paidAmount, invoice.currency)} paid
                         </div>
                       )}
                     </div>
@@ -147,7 +152,7 @@ export default async function InvoicesPage() {
                     </Button>
                     <DownloadInvoiceButton
                       invoiceId={invoice.id}
-                      invoiceNumber={invoice.invoice_number}
+                      invoiceNumber={invoice.invoiceNumber}
                     />
                     {invoice.status === 'draft' && (
                       <>
