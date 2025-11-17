@@ -1,0 +1,250 @@
+{
+  "nav": {
+    "dashboard": "Übersicht",
+    "proposals": "Angebote",
+    "invoices": "Rechnungen",
+    "clients": "Kunden",
+    "timeTracking": "Zeiterfassung",
+    "services": "Leistungen",
+    "reports": "Berichte",
+    "settings": "Einstellungen",
+    "logout": "Abmelden",
+    "login": "Anmelden",
+    "signup": "Registrieren"
+  },
+  "dashboard": {
+    "title": "Übersicht",
+    "welcome": "Willkommen zurück, {name}!",
+    "revenue": {
+      "title": "Umsatz diesen Monat",
+      "total": "Gesamtumsatz",
+      "pending": "Ausstehend",
+      "paid": "Bezahlt"
+    },
+    "invoices": {
+      "pending": "Ausstehende Rechnungen",
+      "overdue": "Überfällige Rechnungen"
+    },
+    "proposals": {
+      "winRate": "Angebots-Erfolgsquote",
+      "sent": "Gesendet",
+      "accepted": "Akzeptiert"
+    },
+    "clients": {
+      "active": "Aktive Kunden"
+    },
+    "quickActions": {
+      "title": "Schnellaktionen",
+      "newProposal": "Neues Angebot",
+      "newInvoice": "Neue Rechnung",
+      "addClient": "Kunde hinzufügen",
+      "startTimer": "Timer starten"
+    },
+    "recentActivity": {
+      "title": "Letzte Aktivitäten",
+      "noActivity": "Keine aktuellen Aktivitäten"
+    }
+  },
+  "proposals": {
+    "title": "Angebote",
+    "new": "Neues Angebot",
+    "list": "Alle Angebote",
+    "draft": "Entwurf",
+    "sent": "Gesendet",
+    "viewed": "Angesehen",
+    "signed": "Unterzeichnet",
+    "rejected": "Abgelehnt",
+    "expired": "Abgelaufen",
+    "create": {
+      "step1": "Vorlage wählen",
+      "step2": "Kunde auswählen",
+      "step3": "Projektdetails",
+      "step4": "KI-Einstellungen",
+      "step5": "Überprüfen & Senden",
+      "template": {
+        "professional": "Professionell Corporate",
+        "creative": "Kreativ Agentur",
+        "minimal": "Beratung Minimal",
+        "tech": "Tech/Software",
+        "marketing": "Marketing Mutig",
+        "freelancer": "Freelancer Portfolio"
+      },
+      "client": {
+        "existing": "Bestehender Kunde",
+        "new": "Neuer Kunde",
+        "search": "Kunden suchen..."
+      },
+      "details": {
+        "title": "Angebotstitel",
+        "description": "Projektbeschreibung",
+        "deliverables": "Lieferungen",
+        "timeline": "Zeitplan",
+        "budget": "Budget"
+      },
+      "ai": {
+        "language": "Sprache",
+        "tone": "Ton",
+        "professional": "Professionell & Formell",
+        "friendly": "Freundlich & Zugänglich",
+        "technical": "Technisch & Detailliert",
+        "creative": "Kreativ & Überzeugend",
+        "industry": "Branchenfokus",
+        "sections": "Abschnitte einschließen",
+        "generate": "Angebot generieren"
+      },
+      "send": {
+        "saveDraft": "Als Entwurf speichern",
+        "sendEmail": "Per E-Mail senden",
+        "shareLink": "Link teilen",
+        "download": "PDF herunterladen"
+      }
+    }
+  },
+  "invoices": {
+    "title": "Rechnungen",
+    "new": "Neue Rechnung",
+    "list": "Alle Rechnungen",
+    "draft": "Entwurf",
+    "sent": "Gesendet",
+    "viewed": "Angesehen",
+    "paid": "Bezahlt",
+    "partiallyPaid": "Teilweise bezahlt",
+    "overdue": "Überfällig",
+    "cancelled": "Storniert",
+    "create": {
+      "fromProposal": "Aus Angebot",
+      "fromScratch": "Von Grund auf",
+      "details": {
+        "number": "Rechnungsnummer",
+        "issueDate": "Rechnungsdatum",
+        "dueDate": "Fälligkeitsdatum",
+        "paymentTerms": "Zahlungsbedingungen"
+      },
+      "items": {
+        "description": "Beschreibung",
+        "quantity": "Menge",
+        "unitPrice": "Einzelpreis",
+        "tax": "Steuer",
+        "total": "Gesamt",
+        "addItem": "Position hinzufügen"
+      },
+      "payment": {
+        "method": "Zahlungsmethode",
+        "stripe": "Stripe",
+        "paypal": "PayPal",
+        "bankTransfer": "Banküberweisung",
+        "cash": "Bargeld",
+        "other": "Sonstige"
+      }
+    }
+  },
+  "clients": {
+    "title": "Kunden",
+    "new": "Neuer Kunde",
+    "list": "Alle Kunden",
+    "details": {
+      "name": "Name",
+      "company": "Firma",
+      "email": "E-Mail",
+      "phone": "Telefon",
+      "address": "Adresse",
+      "city": "Stadt",
+      "postalCode": "Postleitzahl",
+      "country": "Land",
+      "vatNumber": "USt-IdNr."
+    },
+    "stats": {
+      "totalRevenue": "Gesamtumsatz",
+      "outstandingBalance": "Offener Betrag",
+      "totalProposals": "Angebote gesamt",
+      "totalInvoices": "Rechnungen gesamt"
+    }
+  },
+  "timeTracking": {
+    "title": "Zeiterfassung",
+    "startTimer": "Timer starten",
+    "stopTimer": "Timer stoppen",
+    "addManual": "Manuellen Eintrag hinzufügen",
+    "details": {
+      "client": "Kunde",
+      "project": "Projekt",
+      "task": "Aufgabenbeschreibung",
+      "hours": "Stunden",
+      "rate": "Stundensatz",
+      "billable": "Abrechenbar"
+    },
+    "summary": {
+      "totalHours": "Gesamtstunden",
+      "billableHours": "Abrechenbare Stunden",
+      "unbilledAmount": "Nicht abgerechneter Betrag"
+    }
+  },
+  "settings": {
+    "title": "Einstellungen",
+    "business": {
+      "title": "Geschäftsinformationen",
+      "name": "Firmenname",
+      "email": "E-Mail",
+      "phone": "Telefon",
+      "address": "Adresse",
+      "logo": "Logo",
+      "taxId": "Steuernummer",
+      "vatNumber": "USt-IdNr."
+    },
+    "invoice": {
+      "title": "Rechnungseinstellungen",
+      "numberFormat": "Nummernformat",
+      "paymentTerms": "Standard-Zahlungsbedingungen",
+      "taxRate": "Standard-Steuersatz",
+      "currency": "Standardwährung"
+    },
+    "payment": {
+      "title": "Zahlungseinstellungen",
+      "stripe": "Stripe",
+      "paypal": "PayPal",
+      "bankDetails": "Bankdaten"
+    },
+    "email": {
+      "title": "E-Mail-Einstellungen",
+      "fromName": "Absendername",
+      "replyTo": "Antworten an E-Mail",
+      "signature": "E-Mail-Signatur"
+    },
+    "notifications": {
+      "title": "Benachrichtigungen",
+      "email": "E-Mail-Benachrichtigungen",
+      "proposalViewed": "Angebot angesehen",
+      "proposalSigned": "Angebot unterzeichnet",
+      "invoicePaid": "Rechnung bezahlt",
+      "invoiceOverdue": "Rechnung überfällig"
+    }
+  },
+  "common": {
+    "save": "Speichern",
+    "cancel": "Abbrechen",
+    "delete": "Löschen",
+    "edit": "Bearbeiten",
+    "view": "Ansehen",
+    "search": "Suchen",
+    "filter": "Filtern",
+    "export": "Exportieren",
+    "import": "Importieren",
+    "loading": "Lädt...",
+    "error": "Ein Fehler ist aufgetreten",
+    "success": "Erfolg",
+    "confirm": "Bestätigen",
+    "back": "Zurück",
+    "next": "Weiter",
+    "finish": "Fertig",
+    "required": "Erforderlich",
+    "optional": "Optional",
+    "total": "Gesamt",
+    "subtotal": "Zwischensumme",
+    "tax": "Steuer",
+    "discount": "Rabatt",
+    "currency": "Währung",
+    "date": "Datum",
+    "status": "Status",
+    "actions": "Aktionen"
+  }
+}

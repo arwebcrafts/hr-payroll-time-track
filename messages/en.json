@@ -1,0 +1,250 @@
+{
+  "nav": {
+    "dashboard": "Dashboard",
+    "proposals": "Proposals",
+    "invoices": "Invoices",
+    "clients": "Clients",
+    "timeTracking": "Time Tracking",
+    "services": "Services",
+    "reports": "Reports",
+    "settings": "Settings",
+    "logout": "Logout",
+    "login": "Login",
+    "signup": "Sign Up"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "welcome": "Welcome back, {name}!",
+    "revenue": {
+      "title": "Revenue This Month",
+      "total": "Total Revenue",
+      "pending": "Pending",
+      "paid": "Paid"
+    },
+    "invoices": {
+      "pending": "Pending Invoices",
+      "overdue": "Overdue Invoices"
+    },
+    "proposals": {
+      "winRate": "Proposal Win Rate",
+      "sent": "Sent",
+      "accepted": "Accepted"
+    },
+    "clients": {
+      "active": "Active Clients"
+    },
+    "quickActions": {
+      "title": "Quick Actions",
+      "newProposal": "New Proposal",
+      "newInvoice": "New Invoice",
+      "addClient": "Add Client",
+      "startTimer": "Start Timer"
+    },
+    "recentActivity": {
+      "title": "Recent Activity",
+      "noActivity": "No recent activity"
+    }
+  },
+  "proposals": {
+    "title": "Proposals",
+    "new": "New Proposal",
+    "list": "All Proposals",
+    "draft": "Draft",
+    "sent": "Sent",
+    "viewed": "Viewed",
+    "signed": "Signed",
+    "rejected": "Rejected",
+    "expired": "Expired",
+    "create": {
+      "step1": "Choose Template",
+      "step2": "Select Client",
+      "step3": "Project Details",
+      "step4": "AI Settings",
+      "step5": "Review & Send",
+      "template": {
+        "professional": "Professional Corporate",
+        "creative": "Creative Agency",
+        "minimal": "Consulting Minimal",
+        "tech": "Tech/Software",
+        "marketing": "Marketing Bold",
+        "freelancer": "Freelancer Portfolio"
+      },
+      "client": {
+        "existing": "Existing Client",
+        "new": "New Client",
+        "search": "Search clients..."
+      },
+      "details": {
+        "title": "Proposal Title",
+        "description": "Project Description",
+        "deliverables": "Deliverables",
+        "timeline": "Timeline",
+        "budget": "Budget"
+      },
+      "ai": {
+        "language": "Language",
+        "tone": "Tone",
+        "professional": "Professional & Formal",
+        "friendly": "Friendly & Approachable",
+        "technical": "Technical & Detailed",
+        "creative": "Creative & Persuasive",
+        "industry": "Industry Focus",
+        "sections": "Include Sections",
+        "generate": "Generate Proposal"
+      },
+      "send": {
+        "saveDraft": "Save as Draft",
+        "sendEmail": "Send via Email",
+        "shareLink": "Share Link",
+        "download": "Download PDF"
+      }
+    }
+  },
+  "invoices": {
+    "title": "Invoices",
+    "new": "New Invoice",
+    "list": "All Invoices",
+    "draft": "Draft",
+    "sent": "Sent",
+    "viewed": "Viewed",
+    "paid": "Paid",
+    "partiallyPaid": "Partially Paid",
+    "overdue": "Overdue",
+    "cancelled": "Cancelled",
+    "create": {
+      "fromProposal": "From Proposal",
+      "fromScratch": "From Scratch",
+      "details": {
+        "number": "Invoice Number",
+        "issueDate": "Issue Date",
+        "dueDate": "Due Date",
+        "paymentTerms": "Payment Terms"
+      },
+      "items": {
+        "description": "Description",
+        "quantity": "Quantity",
+        "unitPrice": "Unit Price",
+        "tax": "Tax",
+        "total": "Total",
+        "addItem": "Add Item"
+      },
+      "payment": {
+        "method": "Payment Method",
+        "stripe": "Stripe",
+        "paypal": "PayPal",
+        "bankTransfer": "Bank Transfer",
+        "cash": "Cash",
+        "other": "Other"
+      }
+    }
+  },
+  "clients": {
+    "title": "Clients",
+    "new": "New Client",
+    "list": "All Clients",
+    "details": {
+      "name": "Name",
+      "company": "Company",
+      "email": "Email",
+      "phone": "Phone",
+      "address": "Address",
+      "city": "City",
+      "postalCode": "Postal Code",
+      "country": "Country",
+      "vatNumber": "VAT Number"
+    },
+    "stats": {
+      "totalRevenue": "Total Revenue",
+      "outstandingBalance": "Outstanding Balance",
+      "totalProposals": "Total Proposals",
+      "totalInvoices": "Total Invoices"
+    }
+  },
+  "timeTracking": {
+    "title": "Time Tracking",
+    "startTimer": "Start Timer",
+    "stopTimer": "Stop Timer",
+    "addManual": "Add Manual Entry",
+    "details": {
+      "client": "Client",
+      "project": "Project",
+      "task": "Task Description",
+      "hours": "Hours",
+      "rate": "Hourly Rate",
+      "billable": "Billable"
+    },
+    "summary": {
+      "totalHours": "Total Hours",
+      "billableHours": "Billable Hours",
+      "unbilledAmount": "Unbilled Amount"
+    }
+  },
+  "settings": {
+    "title": "Settings",
+    "business": {
+      "title": "Business Information",
+      "name": "Business Name",
+      "email": "Email",
+      "phone": "Phone",
+      "address": "Address",
+      "logo": "Logo",
+      "taxId": "Tax ID",
+      "vatNumber": "VAT Number"
+    },
+    "invoice": {
+      "title": "Invoice Settings",
+      "numberFormat": "Number Format",
+      "paymentTerms": "Default Payment Terms",
+      "taxRate": "Default Tax Rate",
+      "currency": "Default Currency"
+    },
+    "payment": {
+      "title": "Payment Settings",
+      "stripe": "Stripe",
+      "paypal": "PayPal",
+      "bankDetails": "Bank Details"
+    },
+    "email": {
+      "title": "Email Settings",
+      "fromName": "From Name",
+      "replyTo": "Reply-To Email",
+      "signature": "Email Signature"
+    },
+    "notifications": {
+      "title": "Notifications",
+      "email": "Email Notifications",
+      "proposalViewed": "Proposal Viewed",
+      "proposalSigned": "Proposal Signed",
+      "invoicePaid": "Invoice Paid",
+      "invoiceOverdue": "Invoice Overdue"
+    }
+  },
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "view": "View",
+    "search": "Search",
+    "filter": "Filter",
+    "export": "Export",
+    "import": "Import",
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "success": "Success",
+    "confirm": "Confirm",
+    "back": "Back",
+    "next": "Next",
+    "finish": "Finish",
+    "required": "Required",
+    "optional": "Optional",
+    "total": "Total",
+    "subtotal": "Subtotal",
+    "tax": "Tax",
+    "discount": "Discount",
+    "currency": "Currency",
+    "date": "Date",
+    "status": "Status",
+    "actions": "Actions"
+  }
+}
