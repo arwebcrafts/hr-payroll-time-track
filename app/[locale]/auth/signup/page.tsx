@@ -47,7 +47,14 @@ export default function SignupPage() {
       if (error) throw error;
 
       if (data.user) {
-        setSuccess(true);
+        // Check if email confirmation is required or if auto-confirmed
+        if (data.session) {
+          // User is auto-logged in, redirect to onboarding
+          router.push('/onboarding');
+        } else {
+          // Email confirmation required
+          setSuccess(true);
+        }
       }
     } catch (err: any) {
       setError(err.message || 'An error occurred during signup');
