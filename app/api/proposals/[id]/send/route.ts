@@ -148,33 +148,32 @@ export async function POST(
     }
 
     // Fetch proposal with client and user details
-    const { data: proposal, error: proposalError } = await supabase
-      .from('proposals')
-      .select(
-        `
-        *,
-        client:clients(
-          name,
-          company,
-          email
-        ),
-        user:users(
-          business_name,
-          email,
-          phone,
-          currency
-        )
-      `
-      )
-      .eq('id', proposalId)
-      .eq('user_id', user.id)
-      .single();
+    const proposal = await prisma.proposal.findFirst({
+      where: {
+        id: proposalId,
+        userId: session.user.id,
+      },
+      include: {
+        client: {
+          select: {
+            name: true,
+            company: true,
+            email: true,
+          },
+        },
+        user: {
+          select: {
+            businessName: true,
+            email: true,
+            businessPhone: true,
+            defaultCurrency: true,
+          },
+        },
+      },
+    });
 
-    if (proposalError || !proposal) {
-      return NextResponse.json(
-        { error: 'Proposal not found' },
-        { status: 404 }
-      );
+    if (!proposal) {
+      return NextResponse.json({ error: 'Proposal not found' }, { status: 404 });
     }
 
     // Format currency
@@ -202,14 +201,14 @@ export async function POST(
 
     // Prepare email data
     const emailData = {
-      proposalNumber: proposal.proposal_number || `PROP-${proposal.id.slice(0, 8)}`,
+      proposalNumber: proposal.proposalNumber || `PROP-${proposal.id.slice(0, 8)}`,
       clientName: proposal.client?.name || 'Client',
-      companyName: proposal.user?.business_name || 'Your Company',
-      totalAmount: formatCurrency(proposal.total_amount, proposal.user?.currency || 'USD'),
-      validUntil: formatDate(proposal.valid_until || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()),
+      companyName: proposal.user?.businessName || 'Your Company',
+      totalAmount: formatCurrency(proposal.totalAmount, proposal.user?.defaultCurrency || 'USD'),
+      validUntil: formatDate(proposal.validUntil || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()),
       proposalUrl: `${process.env.NEXT_PUBLIC_APP_URL || 'https://yourdomain.com'}/proposals/view/${proposal.id}`,
       companyEmail: proposal.user?.email,
-      companyPhone: proposal.user?.phone,
+      companyPhone: proposal.user?.businessPhone,
       message: message,
     };
 
@@ -237,23 +236,25 @@ export async function POST(
     }
 
     // Update proposal status to 'sent'
-    await supabase
-      .from('proposals')
-      .update({
+    await prisma.proposal.update({
+      where: { id: proposalId },
+      data: {
         status: 'sent',
-        sent_at: new Date().toISOString()
-      })
-      .eq('id', proposalId);
+        sentAt: new Date(),
+      },
+    });
 
     // Log email in database (if email_logs table exists)
     try {
-      await supabase.from('email_logs').insert({
-        user_id: user.id,
-        proposal_id: proposalId,
-        recipient_email: recipientEmail,
-        subject: emailOptions.subject,
-        status: 'sent',
-        sent_at: new Date().toISOString(),
+      await prisma.emailLog.create({
+        data: {
+          userId: session.user.id,
+          proposalId: proposalId,
+          recipientEmail,
+          subject: emailOptions.subject,
+          status: 'sent',
+          sentAt: new Date(),
+        },
       });
     } catch (logError) {
       // Email logs table might not exist yet, continue anyway

@@ -150,7 +150,7 @@ const createInvoiceEmailHTML = (data: {
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // Check if Resend is configured
@@ -164,19 +164,14 @@ export async function POST(
       );
     }
 
-    const supabase = await createClient();
-
     // Get authenticated user
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
+    const session = await getServerSession(authOptions);
 
-    if (authError || !user) {
+    if (!session || !session.user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const invoiceId = params.id;
+    const { id: invoiceId } = await params;
     const body = await request.json();
     const { recipientEmail, message, ccEmail } = body;
 
@@ -189,33 +184,32 @@ export async function POST(
     }
 
     // Fetch invoice with client and user details
-    const { data: invoice, error: invoiceError } = await supabase
-      .from('invoices')
-      .select(
-        `
-        *,
-        client:clients(
-          name,
-          company,
-          email
-        ),
-        user:users(
-          business_name,
-          email,
-          phone,
-          currency
-        )
-      `
-      )
-      .eq('id', invoiceId)
-      .eq('user_id', user.id)
-      .single();
+    const invoice = await prisma.invoice.findFirst({
+      where: {
+        id: invoiceId,
+        userId: session.user.id,
+      },
+      include: {
+        client: {
+          select: {
+            name: true,
+            company: true,
+            email: true,
+          },
+        },
+        user: {
+          select: {
+            businessName: true,
+            email: true,
+            businessPhone: true,
+            defaultCurrency: true,
+          },
+        },
+      },
+    });
 
-    if (invoiceError || !invoice) {
-      return NextResponse.json(
-        { error: 'Invoice not found' },
-        { status: 404 }
-      );
+    if (!invoice) {
+      return NextResponse.json({ error: 'Invoice not found' }, { status: 404 });
     }
 
     // Format currency
@@ -242,25 +236,25 @@ export async function POST(
     };
 
     // Calculate amounts
-    const amountPaid = invoice.amount_paid || 0;
-    const amountDue = invoice.total_amount - amountPaid;
+    const amountPaid = invoice.paidAmount || 0;
+    const amountDue = invoice.totalAmount - amountPaid;
 
     // Check if overdue
-    const dueDate = new Date(invoice.due_date);
+    const dueDate = new Date(invoice.dueDate);
     const now = new Date();
     const isOverdue = now > dueDate && amountDue > 0 && invoice.status !== 'paid';
 
     // Prepare email data
     const emailData = {
-      invoiceNumber: invoice.invoice_number || `INV-${invoice.id.slice(0, 8)}`,
+      invoiceNumber: invoice.invoiceNumber || `INV-${invoice.id.slice(0, 8)}`,
       clientName: invoice.client?.name || 'Client',
-      companyName: invoice.user?.business_name || 'Your Company',
-      totalAmount: formatCurrency(invoice.total_amount, invoice.user?.currency || 'USD'),
-      amountDue: formatCurrency(amountDue, invoice.user?.currency || 'USD'),
-      dueDate: formatDate(invoice.due_date),
+      companyName: invoice.user?.businessName || 'Your Company',
+      totalAmount: formatCurrency(invoice.totalAmount, invoice.user?.defaultCurrency || 'USD'),
+      amountDue: formatCurrency(amountDue, invoice.user?.defaultCurrency || 'USD'),
+      dueDate: formatDate(invoice.dueDate),
       invoiceUrl: `${process.env.NEXT_PUBLIC_APP_URL || 'https://yourdomain.com'}/invoices/view/${invoice.id}`,
       companyEmail: invoice.user?.email,
-      companyPhone: invoice.user?.phone,
+      companyPhone: invoice.user?.businessPhone,
       message: message,
       isOverdue: isOverdue,
     };
@@ -292,24 +286,26 @@ export async function POST(
 
     // Update invoice status to 'sent' if it was draft
     if (invoice.status === 'draft') {
-      await supabase
-        .from('invoices')
-        .update({
+      await prisma.invoice.update({
+        where: { id: invoiceId },
+        data: {
           status: 'sent',
-          sent_at: new Date().toISOString()
-        })
-        .eq('id', invoiceId);
+          sentAt: new Date(),
+        },
+      });
     }
 
     // Log email in database (if email_logs table exists)
     try {
-      await supabase.from('email_logs').insert({
-        user_id: user.id,
-        invoice_id: invoiceId,
-        recipient_email: recipientEmail,
-        subject: emailOptions.subject,
-        status: 'sent',
-        sent_at: new Date().toISOString(),
+      await prisma.emailLog.create({
+        data: {
+          userId: session.user.id,
+          invoiceId: invoiceId,
+          recipientEmail,
+          subject: emailOptions.subject,
+          status: 'sent',
+          sentAt: new Date(),
+        },
       });
     } catch (logError) {
       // Email logs table might not exist yet, continue anyway
