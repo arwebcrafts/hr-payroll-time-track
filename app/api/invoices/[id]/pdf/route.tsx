@@ -133,7 +133,7 @@ export async function GET(
       status: 200,
       headers: {
         'Content-Type': 'application/pdf',
-        'Content-Disposition': `attachment; filename="invoice-${invoice.invoice_number || invoiceId}.pdf"`,
+        'Content-Disposition': `attachment; filename="invoice-${invoice.invoiceNumber || invoiceId}.pdf"`,
       },
     });
   } catch (error) {
