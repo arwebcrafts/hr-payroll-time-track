@@ -204,7 +204,7 @@ export async function POST(
       proposalNumber: proposal.proposalNumber || `PROP-${proposal.id.slice(0, 8)}`,
       clientName: proposal.client?.name || 'Client',
       companyName: proposal.user?.businessName || 'Your Company',
-      totalAmount: formatCurrency(proposal.totalAmount, proposal.user?.defaultCurrency || 'USD'),
+      totalAmount: formatCurrency(Number(proposal.totalAmount || 0), proposal.user?.defaultCurrency || 'USD'),
       validUntil: formatDate(proposal.validUntil || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)),
       proposalUrl: `${process.env.NEXT_PUBLIC_APP_URL || 'https://yourdomain.com'}/proposals/view/${proposal.id}`,
       companyEmail: proposal.user?.email || undefined,
