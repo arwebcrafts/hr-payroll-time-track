@@ -3,8 +3,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
-import { renderToBuffer } from '@react-pdf/renderer';
-import InvoicePDFTemplate from '@/components/pdf/InvoicePDFTemplate';
 
 // Force dynamic rendering for PDF generation
 export const dynamic = 'force-dynamic';
@@ -15,6 +13,10 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    // Dynamically import PDF libraries to avoid build-time issues
+    const { renderToBuffer } = await import('@react-pdf/renderer');
+    const { default: InvoicePDFTemplate } = await import('@/components/pdf/InvoicePDFTemplate');
+
     // Get authenticated user
     const session = await getServerSession(authOptions);
 
