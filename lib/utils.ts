@@ -5,7 +5,7 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export function formatCurrency(amount: number | any, currency: string = 'USD'): string {
+export function formatCurrency(amount: number | { toNumber: () => number }, currency: string = 'USD'): string {
   // Handle Prisma Decimal type (which has a toNumber method)
   const numericAmount = typeof amount === 'object' && amount !== null && 'toNumber' in amount
     ? amount.toNumber()

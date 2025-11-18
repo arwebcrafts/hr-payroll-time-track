@@ -122,17 +122,18 @@ We look forward to working with you!
     // Extract text content from the response
     const content = message.content
       .filter((block) => block.type === 'text')
-      .map((block: any) => block.text)
+      .map((block: { type: 'text'; text: string }) => block.text)
       .join('\n\n');
 
     return NextResponse.json({
       content,
       isTemplate: false,
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error('Error generating proposal:', error);
+    const message = error instanceof Error ? error.message : 'Failed to generate proposal';
     return NextResponse.json(
-      { error: error.message || 'Failed to generate proposal' },
+      { error: message },
       { status: 500 }
     );
   }

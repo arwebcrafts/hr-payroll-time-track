@@ -340,6 +340,7 @@ const ProposalPDFTemplate: React.FC<ProposalPDFTemplateProps> = ({ data }) => {
           <View style={styles.headerTop}>
             <View>
               {data.companyLogo && (
+                // eslint-disable-next-line jsx-a11y/alt-text
                 <Image src={data.companyLogo} style={styles.logo} />
               )}
             </View>

@@ -261,7 +261,7 @@ export async function POST(
     };
 
     // Send email using Resend
-    const emailOptions: any = {
+    const emailOptions: { from: string; to: string; subject: string; html: string; cc?: string } = {
       from: process.env.RESEND_FROM_EMAIL || `${emailData.companyName} <noreply@yourdomain.com>`,
       to: recipientEmail,
       subject: isOverdue
@@ -322,8 +322,9 @@ export async function POST(
     });
   } catch (error) {
     console.error('Error sending invoice email:', error);
+    const message = error instanceof Error ? error.message : 'Failed to send invoice email';
     return NextResponse.json(
-      { error: 'Failed to send invoice email' },
+      { error: message },
       { status: 500 }
     );
   }

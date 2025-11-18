@@ -73,10 +73,11 @@ export async function POST(request: NextRequest) {
     });
 
     return NextResponse.json({ success: true, proposal }, { status: 201 });
-  } catch (error: any) {
+  } catch (error) {
     console.error('Error creating proposal:', error);
+    const message = error instanceof Error ? error.message : 'Failed to create proposal';
     return NextResponse.json(
-      { error: error.message || 'Failed to create proposal' },
+      { error: message },
       { status: 500 }
     );
   }

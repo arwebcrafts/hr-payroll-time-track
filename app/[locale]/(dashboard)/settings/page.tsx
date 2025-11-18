@@ -77,8 +77,9 @@ export default function SettingsPage() {
 
       setSuccess(true);
       setTimeout(() => setSuccess(false), 3000);
-    } catch (err: any) {
-      setError(err.message || 'Failed to update settings');
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to update settings';
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }

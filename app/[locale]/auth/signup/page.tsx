@@ -66,8 +66,9 @@ export default function SignupPage() {
         router.push('/onboarding');
         router.refresh();
       }
-    } catch (err: any) {
-      setError(err.message || 'An error occurred during signup');
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'An error occurred during signup';
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }

@@ -13,7 +13,7 @@ export default function NewInvoicePage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [clients, setClients] = useState<any[]>([]);
+  const [clients, setClients] = useState<Array<{ id: string; name: string; company: string | null }>>([]);
 
   const [formData, setFormData] = useState({
     clientId: '',
@@ -46,11 +46,11 @@ export default function NewInvoicePage() {
     }
   };
 
-  const updateField = (field: string, value: any) => {
+  const updateField = (field: string, value: string | number) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
-  const updateItem = (index: number, field: string, value: any) => {
+  const updateItem = (index: number, field: string, value: string | number) => {
     const newItems = [...formData.items];
     newItems[index] = { ...newItems[index], [field]: value };
     setFormData((prev) => ({ ...prev, items: newItems }));
@@ -127,8 +127,9 @@ export default function NewInvoicePage() {
 
       router.push('/invoices');
       router.refresh();
-    } catch (err: any) {
-      setError(err.message || 'Failed to create invoice');
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to create invoice';
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }

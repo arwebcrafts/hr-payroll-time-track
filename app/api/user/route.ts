@@ -35,10 +35,11 @@ export async function GET() {
     }
 
     return NextResponse.json({ user });
-  } catch (error: any) {
+  } catch (error) {
     console.error('Error fetching user:', error);
+    const message = error instanceof Error ? error.message : 'Failed to fetch user';
     return NextResponse.json(
-      { error: error.message || 'Failed to fetch user' },
+      { error: message },
       { status: 500 }
     );
   }
@@ -82,10 +83,11 @@ export async function PATCH(request: NextRequest) {
     });
 
     return NextResponse.json({ success: true, user });
-  } catch (error: any) {
+  } catch (error) {
     console.error('Error updating user:', error);
+    const message = error instanceof Error ? error.message : 'Failed to update user';
     return NextResponse.json(
-      { error: error.message || 'Failed to update user' },
+      { error: message },
       { status: 500 }
     );
   }

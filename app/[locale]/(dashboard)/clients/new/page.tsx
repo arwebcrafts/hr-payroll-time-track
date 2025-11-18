@@ -51,8 +51,9 @@ export default function NewClientPage() {
 
       router.push('/clients');
       router.refresh();
-    } catch (err: any) {
-      setError(err.message || 'Failed to create client');
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to create client';
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }

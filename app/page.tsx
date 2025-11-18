@@ -10,7 +10,6 @@ import {
   TrendingUp,
   Clock,
   Users,
-  CheckCircle,
   ArrowRight,
   Sparkles,
 } from 'lucide-react';

@@ -64,7 +64,7 @@ export async function GET(
 
     // Calculate amounts
     const subtotal = lineItems.reduce(
-      (sum: number, item: any) => sum + (item.amount || 0),
+      (sum: number, item: { amount?: number }) => sum + (item.amount || 0),
       0
     );
     const taxAmount = (subtotal * Number(invoice.taxRate || 0)) / 100;
@@ -105,7 +105,7 @@ export async function GET(
       clientPhone: invoice.client?.phone || undefined,
       clientAddress: invoice.client?.address || undefined,
       clientVatNumber: invoice.client?.vatNumber || undefined,
-      lineItems: lineItems.map((item: any) => ({
+      lineItems: lineItems.map((item: { description?: string; quantity?: number; rate?: number; amount?: number }) => ({
         description: item.description || '',
         quantity: item.quantity || 1,
         rate: item.rate || 0,
@@ -138,8 +138,9 @@ export async function GET(
     });
   } catch (error) {
     console.error('Error generating invoice PDF:', error);
+    const message = error instanceof Error ? error.message : 'Failed to generate PDF';
     return NextResponse.json(
-      { error: 'Failed to generate PDF' },
+      { error: message },
       { status: 500 }
     );
   }

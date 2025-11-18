@@ -6,14 +6,14 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowLeft, FileText, Sparkles } from 'lucide-react';
+import { ArrowLeft, FileText } from 'lucide-react';
 import Link from 'next/link';
 
 export default function NewProposalPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [clients, setClients] = useState<any[]>([]);
+  const [clients, setClients] = useState<Array<{ id: string; name: string; company: string | null }>>([]);
 
   const [formData, setFormData] = useState({
     clientId: '',
@@ -41,11 +41,11 @@ export default function NewProposalPage() {
     }
   };
 
-  const updateField = (field: string, value: any) => {
+  const updateField = (field: string, value: string | number) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
-  const updateItem = (index: number, field: string, value: any) => {
+  const updateItem = (index: number, field: string, value: string | number) => {
     const newItems = [...formData.items];
     newItems[index] = { ...newItems[index], [field]: value };
     setFormData((prev) => ({ ...prev, items: newItems }));
@@ -123,8 +123,9 @@ export default function NewProposalPage() {
 
       router.push('/proposals');
       router.refresh();
-    } catch (err: any) {
-      setError(err.message || 'Failed to create proposal');
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to create proposal';
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }

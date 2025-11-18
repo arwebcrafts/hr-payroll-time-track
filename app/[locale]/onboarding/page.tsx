@@ -39,7 +39,7 @@ export default function OnboardingPage() {
     timezone: 'UTC',
   });
 
-  const updateFormData = (field: string, value: any) => {
+  const updateFormData = (field: string, value: string | File | null) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
@@ -98,7 +98,7 @@ export default function OnboardingPage() {
       // Redirect to dashboard
       router.push('/dashboard');
       router.refresh();
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error saving profile:', error);
       alert('Failed to save profile. Please try again.');
     } finally {
@@ -229,9 +229,10 @@ export default function OnboardingPage() {
                 <div className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-300 p-12">
                   {formData.logoFile ? (
                     <div className="text-center">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
                         src={URL.createObjectURL(formData.logoFile)}
-                        alt="Logo preview"
+                        alt="Business logo preview"
                         className="mx-auto mb-4 h-32 w-32 object-contain"
                       />
                       <p className="text-sm text-gray-600">{formData.logoFile.name}</p>

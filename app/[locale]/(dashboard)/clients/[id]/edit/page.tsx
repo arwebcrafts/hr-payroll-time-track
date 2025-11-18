@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -29,11 +29,7 @@ export default function EditClientPage() {
     languagePreference: 'en',
   });
 
-  useEffect(() => {
-    fetchClient();
-  }, []);
-
-  const fetchClient = async () => {
+  const fetchClient = useCallback(async () => {
     try {
       const response = await fetch(`/api/clients/${params.id}`);
       const data = await response.json();
@@ -56,12 +52,17 @@ export default function EditClientPage() {
           languagePreference: data.client.languagePreference || 'en',
         });
       }
-    } catch (err: any) {
-      setError(err.message || 'Failed to fetch client');
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to fetch client';
+      setError(errorMessage);
     } finally {
       setFetching(false);
     }
-  };
+  }, [params.id]);
+
+  useEffect(() => {
+    fetchClient();
+  }, [fetchClient]);
 
   const updateField = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -87,8 +88,9 @@ export default function EditClientPage() {
 
       router.push('/clients');
       router.refresh();
-    } catch (err: any) {
-      setError(err.message || 'Failed to update client');
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to update client';
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }

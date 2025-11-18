@@ -4,7 +4,7 @@ import { prisma } from '@/lib/prisma';
 import { redirect } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { FileText, Receipt, UserPlus, Clock, TrendingUp, AlertCircle, Eye, CheckCircle } from 'lucide-react';
+import { FileText, Receipt, UserPlus, Clock, TrendingUp, AlertCircle } from 'lucide-react';
 import Link from 'next/link';
 
 export default async function DashboardPage() {
