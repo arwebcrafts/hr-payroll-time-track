@@ -190,8 +190,8 @@ export async function POST(
     };
 
     // Format date
-    const formatDate = (dateString: string) => {
-      const date = new Date(dateString);
+    const formatDate = (dateInput: string | Date) => {
+      const date = typeof dateInput === 'string' ? new Date(dateInput) : dateInput;
       return date.toLocaleDateString('en-US', {
         year: 'numeric',
         month: 'long',
@@ -205,7 +205,7 @@ export async function POST(
       clientName: proposal.client?.name || 'Client',
       companyName: proposal.user?.businessName || 'Your Company',
       totalAmount: formatCurrency(proposal.totalAmount, proposal.user?.defaultCurrency || 'USD'),
-      validUntil: formatDate(proposal.validUntil || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()),
+      validUntil: formatDate(proposal.validUntil || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)),
       proposalUrl: `${process.env.NEXT_PUBLIC_APP_URL || 'https://yourdomain.com'}/proposals/view/${proposal.id}`,
       companyEmail: proposal.user?.email,
       companyPhone: proposal.user?.businessPhone,

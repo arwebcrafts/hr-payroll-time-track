@@ -226,8 +226,8 @@ export async function POST(
     };
 
     // Format date
-    const formatDate = (dateString: string) => {
-      const date = new Date(dateString);
+    const formatDate = (dateInput: string | Date) => {
+      const date = typeof dateInput === 'string' ? new Date(dateInput) : dateInput;
       return date.toLocaleDateString('en-US', {
         year: 'numeric',
         month: 'long',
