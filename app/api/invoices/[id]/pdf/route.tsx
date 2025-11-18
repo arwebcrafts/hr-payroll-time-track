@@ -89,8 +89,8 @@ export async function GET(
     // Prepare PDF data
     const pdfData = {
       invoiceNumber: invoice.invoiceNumber || `INV-${invoice.id.slice(0, 8)}`,
-      issueDate: invoice.issueDate || invoice.createdAt,
-      dueDate: invoice.dueDate || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+      issueDate: (invoice.issueDate || invoice.createdAt).toISOString(),
+      dueDate: (invoice.dueDate || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)).toISOString(),
       status: status as 'draft' | 'sent' | 'paid' | 'overdue' | 'cancelled',
       paymentTerms: invoice.paymentTerms || 'Net 30',
       companyName: invoice.user?.businessName || 'Your Company',
