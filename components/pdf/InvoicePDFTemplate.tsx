@@ -394,7 +394,7 @@ const formatDate = (dateString: string) => {
   });
 };
 
-const getStatusStyle = (status: string) => {
+const getStatusStyle = (status: string, styles: ReturnType<typeof getStyles>) => {
   switch (status) {
     case 'paid':
       return styles.statusBadgePaid;
@@ -462,7 +462,7 @@ const InvoicePDFTemplate: React.FC<InvoicePDFTemplateProps> = ({ data }) => {
           <Text style={styles.invoiceNumber}>
             Invoice #{data.invoiceNumber}
           </Text>
-          <Text style={[styles.statusBadge, getStatusStyle(data.status)]}>
+          <Text style={[styles.statusBadge, getStatusStyle(data.status, styles)]}>
             {getStatusLabel(data.status)}
           </Text>
         </View>
