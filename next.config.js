@@ -18,6 +18,13 @@ const nextConfig = {
       bodySizeLimit: '5mb',
     },
   },
+  webpack: (config, { isServer }) => {
+    if (isServer) {
+      // Externalize @react-pdf/renderer and canvas for server-side rendering
+      config.externals.push('@react-pdf/renderer', 'canvas');
+    }
+    return config;
+  },
 };
 
 module.exports = withNextIntl(nextConfig);

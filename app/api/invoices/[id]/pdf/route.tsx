@@ -6,6 +6,10 @@ import { prisma } from '@/lib/prisma';
 import { renderToBuffer } from '@react-pdf/renderer';
 import InvoicePDFTemplate from '@/components/pdf/InvoicePDFTemplate';
 
+// Force dynamic rendering for PDF generation
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
+
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
