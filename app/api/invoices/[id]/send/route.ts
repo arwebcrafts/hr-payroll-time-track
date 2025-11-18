@@ -301,6 +301,8 @@ export async function POST(
       await prisma.emailLog.create({
         data: {
           userId: session.user.id,
+          documentType: 'invoice',
+          documentId: invoiceId,
           invoiceId: invoiceId,
           recipientEmail,
           subject: emailOptions.subject,

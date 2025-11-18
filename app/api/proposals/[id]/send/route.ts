@@ -249,6 +249,8 @@ export async function POST(
       await prisma.emailLog.create({
         data: {
           userId: session.user.id,
+          documentType: 'proposal',
+          documentId: proposalId,
           proposalId: proposalId,
           recipientEmail,
           subject: emailOptions.subject,
