@@ -207,9 +207,9 @@ export async function POST(
       totalAmount: formatCurrency(proposal.totalAmount, proposal.user?.defaultCurrency || 'USD'),
       validUntil: formatDate(proposal.validUntil || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)),
       proposalUrl: `${process.env.NEXT_PUBLIC_APP_URL || 'https://yourdomain.com'}/proposals/view/${proposal.id}`,
-      companyEmail: proposal.user?.email,
-      companyPhone: proposal.user?.businessPhone,
-      message: message,
+      companyEmail: proposal.user?.email || undefined,
+      companyPhone: proposal.user?.businessPhone || undefined,
+      message: message || undefined,
     };
 
     // Send email using Resend

@@ -254,9 +254,9 @@ export async function POST(
       amountDue: formatCurrency(amountDue, invoice.user?.defaultCurrency || 'USD'),
       dueDate: formatDate(invoice.dueDate),
       invoiceUrl: `${process.env.NEXT_PUBLIC_APP_URL || 'https://yourdomain.com'}/invoices/view/${invoice.id}`,
-      companyEmail: invoice.user?.email,
-      companyPhone: invoice.user?.businessPhone,
-      message: message,
+      companyEmail: invoice.user?.email || undefined,
+      companyPhone: invoice.user?.businessPhone || undefined,
+      message: message || undefined,
       isOverdue: isOverdue,
     };
 
