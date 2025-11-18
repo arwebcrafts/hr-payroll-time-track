@@ -137,7 +137,7 @@ export default async function InvoicesPage() {
                       <div className="text-2xl font-bold">
                         {formatCurrency(invoice.totalAmount, invoice.currency)}
                       </div>
-                      {invoice.amountPaid > 0 && invoice.status !== 'paid' && (
+                      {Number(invoice.amountPaid) > 0 && invoice.status !== 'paid' && (
                         <div className="text-sm text-muted-foreground">
                           {formatCurrency(invoice.amountPaid, invoice.currency)} paid
                         </div>
