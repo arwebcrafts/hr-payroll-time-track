@@ -14,24 +14,12 @@ const nextConfig = {
       // },
     ],
   },
+  // Treat @react-pdf/renderer as external package (not bundled)
+  serverComponentsExternalPackages: ['@react-pdf/renderer', 'canvas'],
   experimental: {
     serverActions: {
       bodySizeLimit: '5mb',
     },
-  },
-  webpack: (config, { isServer }) => {
-    if (isServer) {
-      // Make @react-pdf/renderer and related modules external to prevent bundling
-      const externals = config.externals || [];
-      config.externals = [
-        ...externals,
-        {
-          '@react-pdf/renderer': 'commonjs @react-pdf/renderer',
-          'canvas': 'commonjs canvas',
-        },
-      ];
-    }
-    return config;
   },
 };
 
