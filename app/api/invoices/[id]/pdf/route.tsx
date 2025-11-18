@@ -15,7 +15,8 @@ export async function GET(
   try {
     // Dynamically import PDF libraries to avoid build-time issues
     const { renderToBuffer } = await import('@react-pdf/renderer');
-    const { default: InvoicePDFTemplate } = await import('@/components/pdf/InvoicePDFTemplate');
+    const getInvoicePDFTemplate = (await import('@/components/pdf/InvoicePDFTemplate-runtime')).default;
+    const InvoicePDFTemplate = await getInvoicePDFTemplate();
 
     // Get authenticated user
     const session = await getServerSession(authOptions);
