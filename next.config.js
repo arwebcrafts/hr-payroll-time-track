@@ -14,8 +14,6 @@ const nextConfig = {
       // },
     ],
   },
-  // Treat @react-pdf/renderer as external package (not bundled)
-  serverComponentsExternalPackages: ['@react-pdf/renderer', 'canvas'],
   experimental: {
     serverActions: {
       bodySizeLimit: '5mb',
