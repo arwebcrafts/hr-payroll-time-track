@@ -24,6 +24,8 @@ A comprehensive SaaS application for freelancers, agencies, and consultants to c
 npm install
 ```
 
+> **Note:** If you encounter Prisma engine download errors during installation (especially in restricted networks or Docker environments), the `PRISMA_ENGINES_CHECKSUM_IGNORE_MISSING=1` environment variable is already configured in the build scripts via the `cross-env` package.
+
 2. **Set up MySQL Database:**
 ```bash
 # Option A: Local MySQL
