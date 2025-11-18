@@ -3,6 +3,6 @@
 
 export default async function getProposalPDFTemplate() {
   // Dynamic import that only executes at runtime
-  const module = await import('./ProposalPDFTemplate-impl');
-  return module.default;
+  const templateModule = await import('./ProposalPDFTemplate-impl');
+  return templateModule.default;
 }

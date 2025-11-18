@@ -3,6 +3,6 @@
 
 export default async function getInvoicePDFTemplate() {
   // Dynamic import that only executes at runtime
-  const module = await import('./InvoicePDFTemplate-impl');
-  return module.default;
+  const templateModule = await import('./InvoicePDFTemplate-impl');
+  return templateModule.default;
 }
