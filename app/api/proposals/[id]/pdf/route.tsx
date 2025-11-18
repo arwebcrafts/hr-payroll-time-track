@@ -76,7 +76,7 @@ export async function GET(
       clientAddress: proposal.client?.address || undefined,
       title: proposal.title || 'Project Proposal',
       description: proposal.description || undefined,
-      lineItems: lineItems.map((item: { description?: string; quantity?: number; unitPrice?: number }) => ({
+      lineItems: (lineItems as Array<{ description?: string; quantity?: number; unitPrice?: number }>).map((item) => ({
         description: item.description || '',
         quantity: item.quantity || 1,
         rate: item.unitPrice || 0,

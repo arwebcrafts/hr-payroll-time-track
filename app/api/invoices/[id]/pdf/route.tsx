@@ -105,7 +105,7 @@ export async function GET(
       clientPhone: invoice.client?.phone || undefined,
       clientAddress: invoice.client?.address || undefined,
       clientVatNumber: invoice.client?.vatNumber || undefined,
-      lineItems: lineItems.map((item: { description?: string; quantity?: number; rate?: number; amount?: number }) => ({
+      lineItems: (lineItems as Array<{ description?: string; quantity?: number; rate?: number; amount?: number }>).map((item) => ({
         description: item.description || '',
         quantity: item.quantity || 1,
         rate: item.rate || 0,
