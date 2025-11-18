@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
-import { renderToStream } from '@react-pdf/renderer';
+import { renderToBuffer } from '@react-pdf/renderer';
 import InvoicePDFTemplate from '@/components/pdf/InvoicePDFTemplate';
 
 export async function GET(
@@ -123,22 +123,10 @@ export async function GET(
       paymentInstructions: invoice.paymentInstructions || undefined,
     };
 
-    // Generate PDF stream
-    const stream = await renderToStream(
+    // Generate PDF buffer
+    const buffer = await renderToBuffer(
       <InvoicePDFTemplate data={pdfData} />
     );
-
-    // Convert stream to buffer
-    const chunks: Uint8Array[] = [];
-    const reader = stream.getReader();
-
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      if (value) chunks.push(value);
-    }
-
-    const buffer = Buffer.concat(chunks);
 
     // Return PDF as response
     return new NextResponse(buffer, {
