@@ -38,8 +38,11 @@ function registerFonts() {
   }
 }
 
-// Define styles
-const styles = StyleSheet.create({
+// Lazy styles creation - only runs when component is first used
+let stylesCache: ReturnType<typeof StyleSheet.create> | null = null;
+function getStyles() {
+  if (!stylesCache) {
+    stylesCache = StyleSheet.create({
   page: {
     fontFamily: 'Roboto',
     fontSize: 10,
@@ -323,7 +326,10 @@ const styles = StyleSheet.create({
     color: '#7f1d1d',
     lineHeight: 1.5,
   },
-});
+    });
+  }
+  return stylesCache;
+}
 
 interface InvoiceLineItem {
   description: string;
@@ -417,6 +423,7 @@ const getStatusLabel = (status: string) => {
 const InvoicePDFTemplate: React.FC<InvoicePDFTemplateProps> = ({ data }) => {
   // Register fonts lazily on first use
   registerFonts();
+  const styles = getStyles();
 
   const isOverdue = data.status === 'overdue';
   const isPaid = data.status === 'paid';

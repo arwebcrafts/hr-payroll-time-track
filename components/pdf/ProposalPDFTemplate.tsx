@@ -38,8 +38,11 @@ function registerFonts() {
   }
 }
 
-// Define styles
-const styles = StyleSheet.create({
+// Lazy styles creation - only runs when component is first used
+let stylesCache: ReturnType<typeof StyleSheet.create> | null = null;
+function getStyles() {
+  if (!stylesCache) {
+    stylesCache = StyleSheet.create({
   page: {
     fontFamily: 'Roboto',
     fontSize: 10,
@@ -276,7 +279,10 @@ const styles = StyleSheet.create({
     color: '#64748b',
     textAlign: 'center',
   },
-});
+    });
+  }
+  return stylesCache;
+}
 
 interface ProposalLineItem {
   description: string;
@@ -340,6 +346,7 @@ const formatDate = (dateString: string) => {
 const ProposalPDFTemplate: React.FC<ProposalPDFTemplateProps> = ({ data }) => {
   // Register fonts lazily on first use
   registerFonts();
+  const styles = getStyles();
 
   return (
     <Document>
