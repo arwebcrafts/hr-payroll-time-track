@@ -5,9 +5,8 @@ import { locales } from '@/i18n/request';
 import { SessionProvider } from '@/components/SessionProvider';
 import '../globals.css';
 
-export function generateStaticParams() {
-  return locales.map((locale) => ({ locale }));
-}
+// Force dynamic rendering to avoid context issues during static generation
+export const dynamic = 'force-dynamic';
 
 export default async function LocaleLayout({
   children,

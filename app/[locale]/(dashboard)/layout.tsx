@@ -4,6 +4,9 @@ import { redirect } from 'next/navigation';
 import { setRequestLocale } from 'next-intl/server';
 import { Navigation } from '@/components/navigation';
 
+// Force dynamic rendering for authenticated routes
+export const dynamic = 'force-dynamic';
+
 type Props = {
   children: React.ReactNode;
   params: Promise<{ locale: string }>;
