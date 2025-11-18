@@ -67,10 +67,10 @@ export async function GET(
       (sum: number, item: any) => sum + (item.amount || 0),
       0
     );
-    const taxAmount = (subtotal * (invoice.taxRate || 0)) / 100;
+    const taxAmount = (subtotal * Number(invoice.taxRate || 0)) / 100;
     const totalAfterTax = subtotal + taxAmount;
-    const total = totalAfterTax - (invoice.discount || 0);
-    const amountPaid = invoice.amountPaid || 0;
+    const total = totalAfterTax - Number(invoice.discount || 0);
+    const amountPaid = Number(invoice.amountPaid || 0);
     const amountDue = total - amountPaid;
 
     // Determine status based on due date and payment
