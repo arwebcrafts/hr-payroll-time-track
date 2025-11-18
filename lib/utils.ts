@@ -1,13 +1,16 @@
 import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
-import { Decimal } from '@prisma/client/runtime/library';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export function formatCurrency(amount: number | Decimal, currency: string = 'USD'): string {
-  const numericAmount = amount instanceof Decimal ? amount.toNumber() : amount;
+export function formatCurrency(amount: number | any, currency: string = 'USD'): string {
+  // Handle Prisma Decimal type (which has a toNumber method)
+  const numericAmount = typeof amount === 'object' && amount !== null && 'toNumber' in amount
+    ? amount.toNumber()
+    : Number(amount);
+
   return new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency,
