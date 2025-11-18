@@ -1,15 +1,17 @@
 import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
+import { Decimal } from '@prisma/client/runtime/library';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export function formatCurrency(amount: number, currency: string = 'USD'): string {
+export function formatCurrency(amount: number | Decimal, currency: string = 'USD'): string {
+  const numericAmount = amount instanceof Decimal ? amount.toNumber() : amount;
   return new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency,
-  }).format(amount);
+  }).format(numericAmount);
 }
 
 export function formatDate(date: Date | string, locale: string = 'en'): string {
