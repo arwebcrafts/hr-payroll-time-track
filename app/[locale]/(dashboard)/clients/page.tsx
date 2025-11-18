@@ -6,8 +6,15 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Plus, Mail, Phone, Building2 } from 'lucide-react';
 import Link from 'next/link';
+import { setRequestLocale } from 'next-intl/server';
 
-export default async function ClientsPage() {
+type Props = {
+  params: Promise<{ locale: string }>;
+};
+
+export default async function ClientsPage({ params }: Props) {
+  const { locale } = await params;
+  setRequestLocale(locale);
   const session = await getServerSession(authOptions);
 
   if (!session || !session.user) {

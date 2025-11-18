@@ -1,8 +1,15 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Clock, Play, Square, Plus } from 'lucide-react';
+import { setRequestLocale } from 'next-intl/server';
 
-export default function TimeTrackingPage() {
+type Props = {
+  params: Promise<{ locale: string }>;
+};
+
+export default async function TimeTrackingPage({ params }: Props) {
+  const { locale } = await params;
+  setRequestLocale(locale);
   return (
     <div className="p-8">
       <div className="mb-8 flex items-center justify-between">

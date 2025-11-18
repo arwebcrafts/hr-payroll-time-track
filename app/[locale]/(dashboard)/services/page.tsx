@@ -1,8 +1,15 @@
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Plus, Briefcase } from 'lucide-react';
+import { setRequestLocale } from 'next-intl/server';
 
-export default function ServicesPage() {
+type Props = {
+  params: Promise<{ locale: string }>;
+};
+
+export default async function ServicesPage({ params }: Props) {
+  const { locale } = await params;
+  setRequestLocale(locale);
   return (
     <div className="p-8">
       <div className="mb-8 flex items-center justify-between">

@@ -1,7 +1,14 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { BarChart, TrendingUp, DollarSign, FileText } from 'lucide-react';
+import { setRequestLocale } from 'next-intl/server';
 
-export default function ReportsPage() {
+type Props = {
+  params: Promise<{ locale: string }>;
+};
+
+export default async function ReportsPage({ params }: Props) {
+  const { locale } = await params;
+  setRequestLocale(locale);
   return (
     <div className="p-8">
       <div className="mb-8">

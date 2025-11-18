@@ -9,6 +9,7 @@ import { Plus, Receipt, Eye, CheckCircle, Clock, AlertCircle } from 'lucide-reac
 import Link from 'next/link';
 import { formatCurrency, formatDate } from '@/lib/utils';
 import { DownloadInvoiceButton } from '@/components/DownloadInvoiceButton';
+import { setRequestLocale } from 'next-intl/server';
 
 const statusConfig = {
   draft: { label: 'Draft', variant: 'outline' as const, icon: Clock },
@@ -20,7 +21,13 @@ const statusConfig = {
   cancelled: { label: 'Cancelled', variant: 'outline' as const, icon: Clock },
 };
 
-export default async function InvoicesPage() {
+type Props = {
+  params: Promise<{ locale: string }>;
+};
+
+export default async function InvoicesPage({ params }: Props) {
+  const { locale } = await params;
+  setRequestLocale(locale);
   const session = await getServerSession(authOptions);
 
   if (!session || !session.user) {

@@ -9,6 +9,7 @@ import { Plus, FileText, Eye, CheckCircle, XCircle, Clock } from 'lucide-react';
 import Link from 'next/link';
 import { formatCurrency, formatDate } from '@/lib/utils';
 import { DownloadProposalButton } from '@/components/DownloadProposalButton';
+import { setRequestLocale } from 'next-intl/server';
 
 const statusConfig = {
   draft: { label: 'Draft', variant: 'outline' as const, icon: Clock },
@@ -19,7 +20,13 @@ const statusConfig = {
   expired: { label: 'Expired', variant: 'outline' as const, icon: Clock },
 };
 
-export default async function ProposalsPage() {
+type Props = {
+  params: Promise<{ locale: string }>;
+};
+
+export default async function ProposalsPage({ params }: Props) {
+  const { locale } = await params;
+  setRequestLocale(locale);
   const session = await getServerSession(authOptions);
 
   if (!session || !session.user) {
