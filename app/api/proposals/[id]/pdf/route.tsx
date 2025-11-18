@@ -98,7 +98,7 @@ export async function GET(
     );
 
     // Return PDF as response
-    return new NextResponse(buffer, {
+    return new NextResponse(buffer as unknown as BodyInit, {
       status: 200,
       headers: {
         'Content-Type': 'application/pdf',
