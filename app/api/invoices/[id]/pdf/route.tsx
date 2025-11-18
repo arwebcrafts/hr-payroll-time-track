@@ -44,7 +44,7 @@ export async function GET(
             businessPhone: true,
             businessAddress: true,
             taxId: true,
-            logoUrl: true,
+            businessLogoUrl: true,
             defaultCurrency: true,
             defaultLanguage: true,
           },

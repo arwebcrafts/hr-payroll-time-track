@@ -26,7 +26,7 @@ export async function GET() {
         vatNumber: true,
         defaultCurrency: true,
         defaultLanguage: true,
-        logoUrl: true,
+        businessLogoUrl: true,
       },
     });
 
