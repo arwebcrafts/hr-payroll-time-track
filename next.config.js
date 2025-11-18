@@ -19,6 +19,20 @@ const nextConfig = {
       bodySizeLimit: '5mb',
     },
   },
+  webpack: (config, { isServer }) => {
+    if (isServer) {
+      // Make @react-pdf/renderer and related modules external to prevent bundling
+      const externals = config.externals || [];
+      config.externals = [
+        ...externals,
+        {
+          '@react-pdf/renderer': 'commonjs @react-pdf/renderer',
+          'canvas': 'commonjs canvas',
+        },
+      ];
+    }
+    return config;
+  },
 };
 
 module.exports = withNextIntl(nextConfig);
