@@ -2,6 +2,7 @@
 const withNextIntl = require('next-intl/plugin')('./i18n/request.ts');
 
 const nextConfig = {
+  output: 'standalone',
   images: {
     domains: ['localhost'],
     remotePatterns: [
