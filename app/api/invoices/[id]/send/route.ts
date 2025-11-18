@@ -236,8 +236,9 @@ export async function POST(
     };
 
     // Calculate amounts
-    const amountPaid = invoice.paidAmount || 0;
-    const amountDue = invoice.totalAmount - amountPaid;
+    const amountPaid = Number(invoice.amountPaid || 0);
+    const totalAmount = Number(invoice.totalAmount || 0);
+    const amountDue = totalAmount - amountPaid;
 
     // Check if overdue
     const dueDate = new Date(invoice.dueDate);
@@ -249,7 +250,7 @@ export async function POST(
       invoiceNumber: invoice.invoiceNumber || `INV-${invoice.id.slice(0, 8)}`,
       clientName: invoice.client?.name || 'Client',
       companyName: invoice.user?.businessName || 'Your Company',
-      totalAmount: formatCurrency(invoice.totalAmount, invoice.user?.defaultCurrency || 'USD'),
+      totalAmount: formatCurrency(totalAmount, invoice.user?.defaultCurrency || 'USD'),
       amountDue: formatCurrency(amountDue, invoice.user?.defaultCurrency || 'USD'),
       dueDate: formatDate(invoice.dueDate),
       invoiceUrl: `${process.env.NEXT_PUBLIC_APP_URL || 'https://yourdomain.com'}/invoices/view/${invoice.id}`,
